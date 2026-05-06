@@ -1,0 +1,487 @@
+from __future__ import annotations
+
+import json
+import math
+from dataclasses import dataclass
+from datetime import date
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+
+from invest_system.benchmarks import format_benchmark_prices
+from invest_system.config import Settings
+from invest_system.data_feed import ensure_panel_has_symbols, fetch_intraday_last_prices, latest_row
+from invest_system.assistant.runner import run_intraday_assistant_for_day
+from invest_system.market_scanner import scan_cn_candidates_with_akshare
+from invest_system.market_context import fetch_external_context
+from invest_system.llm_strategy import (
+    build_user_prompt,
+    deepseek_decision_sync,
+    system_prompt_for,
+)
+from invest_system.portfolio import Portfolio
+from invest_system.symbols import is_valid_cn_yahoo_symbol
+
+
+def _lot_floor(shares: int, lot_size: int) -> int:
+    if shares <= 0:
+        return 0
+    if lot_size <= 1:
+        return shares
+    return (shares // lot_size) * lot_size
+
+
+@dataclass
+class EquitySnapshot:
+    day: date
+    cash: float
+    equity: float
+    positions: dict[str, float]
+
+
+def _fmt_recent_bars(df: pd.DataFrame, symbols: list[str], as_of: pd.Timestamp, lookback: int = 15) -> str:
+    try:
+        sub = df.loc[:as_of].tail(lookback)
+    except KeyError:
+        sub = df[df.index <= as_of].tail(lookback)
+    if isinstance(sub.columns, pd.MultiIndex):
+        sub = sub.sort_index(axis=1)
+    lines: list[str] = []
+    for sym in symbols:
+        try:
+            closes = sub[(sym, "Close")].dropna()
+            if closes.empty:
+                continue
+            last = float(closes.iloc[-1])
+            lo = float(closes.min())
+            hi = float(closes.max())
+            lines.append(f"{sym}: close={last:.2f}, range[{lookback}d]={lo:.2f}-{hi:.2f}")
+        except (KeyError, TypeError, ValueError):
+            continue
+    return "\n".join(lines) if lines else "(no bar data)"
+
+
+def _build_candidate_pool(
+    df: pd.DataFrame,
+    symbols: list[str],
+    as_of: pd.Timestamp,
+    *,
+    top_n: int,
+) -> tuple[list[str], str]:
+    """Rank symbols by short-term momentum + liquidity for LLM free-selection guidance."""
+    if top_n <= 0 or not symbols:
+        return [], ""
+    unique = list(dict.fromkeys([s.strip().upper() for s in symbols if s.strip()]))
+    if not unique:
+        return [], ""
+    try:
+        sub = df.loc[:as_of].tail(15)
+    except KeyError:
+        sub = df[df.index <= as_of].tail(15)
+
+    rows: list[dict[str, float | str]] = []
+    for sym in unique:
+        try:
+            closes = sub[(sym, "Close")].dropna()
+            if len(closes) < 2:
+                continue
+            last = float(closes.iloc[-1])
+            prev = float(closes.iloc[-2])
+            if prev <= 0:
+                continue
+            ret1 = (last / prev - 1.0) * 100.0
+            if len(closes) >= 6 and float(closes.iloc[-6]) > 0:
+                ret5 = (last / float(closes.iloc[-6]) - 1.0) * 100.0
+            else:
+                ret5 = ret1
+            vol = sub[(sym, "Volume")].dropna() if (sym, "Volume") in sub.columns else pd.Series(dtype=float)
+            last_vol = float(vol.iloc[-1]) if not vol.empty else 0.0
+            notional = max(0.0, last * last_vol)
+            score = 0.65 * ret1 + 0.35 * ret5
+            rows.append(
+                {
+                    "symbol": sym,
+                    "score": score,
+                    "ret1d_pct": ret1,
+                    "ret5d_pct": ret5,
+                    "last_close": last,
+                    "notional": notional,
+                }
+            )
+        except (KeyError, TypeError, ValueError, ZeroDivisionError):
+            continue
+    if not rows:
+        return [], ""
+
+    rows = sorted(rows, key=lambda x: (float(x["score"]), float(x["notional"])), reverse=True)[:top_n]
+    picked = [str(r["symbol"]) for r in rows]
+    lines = [f"candidates={picked}"]
+    for r in rows[: min(15, len(rows))]:
+        lines.append(
+            f"{r['symbol']}: score={float(r['score']):.2f}, ret1d={float(r['ret1d_pct']):.2f}%, "
+            f"ret5d={float(r['ret5d_pct']):.2f}%, close={float(r['last_close']):.2f}"
+        )
+    return picked, "\n".join(lines)
+
+
+def _cap_buy_shares(
+    portfolio: Portfolio,
+    symbol: str,
+    want: int,
+    price: float,
+    max_fraction: float,
+    prices: dict[str, float],
+    lot_size: int,
+) -> int:
+    if want <= 0 or price <= 0:
+        return 0
+    fee_rate = portfolio.fee_rate
+    max_cash = portfolio.cash
+    max_by_cash = int(max_cash / (price * (1 + fee_rate)))
+    eq = portfolio.equity(prices)
+    current_mv = portfolio.market_value(symbol, prices)
+    cap_mv = max_fraction * eq if eq > 0 else 0.0
+    room_mv = max(0.0, cap_mv - current_mv)
+    max_by_fraction = int(room_mv / price) if price > 0 else 0
+    raw = max(0, min(want, max_by_cash, max_by_fraction))
+    return _lot_floor(raw, lot_size)
+
+
+def _apply_actions(
+    portfolio: Portfolio,
+    actions: list[dict[str, Any]],
+    prices: dict[str, float],
+    universe: set[str],
+    day: date,
+    max_fraction: float,
+    lot_size: int,
+    *,
+    free_selection: bool,
+) -> None:
+    sells = [a for a in actions if str(a.get("side", "")).lower() == "sell"]
+    buys = [a for a in actions if str(a.get("side", "")).lower() == "buy"]
+
+    for a in sells:
+        sym = str(a.get("symbol", "")).upper().strip()
+        if not sym:
+            continue
+        if not free_selection and sym not in universe:
+            continue
+        if free_selection and not is_valid_cn_yahoo_symbol(sym):
+            continue
+        price = prices.get(sym)
+        if price is None:
+            continue
+        try:
+            want = int(float(a.get("shares", 0)))
+        except (TypeError, ValueError):
+            continue
+        held = portfolio.positions.get(sym, 0.0)
+        raw_sell = min(want, int(math.floor(held)))
+        shares = _lot_floor(raw_sell, lot_size)
+        if shares > 0:
+            portfolio.sell(day, sym, float(shares), price)
+
+    for a in buys:
+        sym = str(a.get("symbol", "")).upper().strip()
+        if not sym:
+            continue
+        if not free_selection and sym not in universe:
+            continue
+        if free_selection and not is_valid_cn_yahoo_symbol(sym):
+            continue
+        price = prices.get(sym)
+        if price is None:
+            continue
+        try:
+            want = int(float(a.get("shares", 0)))
+        except (TypeError, ValueError):
+            continue
+        capped = _cap_buy_shares(portfolio, sym, want, price, max_fraction, prices, lot_size)
+        if capped > 0:
+            portfolio.buy(day, sym, float(capped), price)
+
+
+def _initial_buy_hold(
+    portfolio: Portfolio,
+    prices: dict[str, float],
+    universe: list[str],
+    day: date,
+    lot_size: int,
+    deploy_fraction: float = 0.95,
+) -> None:
+    if not prices:
+        return
+    budget = portfolio.cash * deploy_fraction
+    per = budget / max(len(universe), 1)
+    for sym in universe:
+        p = prices.get(sym)
+        if p is None or p <= 0:
+            continue
+        fee_rate = portfolio.fee_rate
+        raw = int(per / (p * (1 + fee_rate)))
+        shares = _lot_floor(raw, lot_size)
+        if shares > 0:
+            portfolio.buy(day, sym, float(shares), p)
+
+
+def run_simulation(
+    settings: Settings,
+    price_df: pd.DataFrame,
+) -> tuple[Portfolio, list[EquitySnapshot], list[Path]]:
+    free = settings.is_free_selection()
+    fixed_syms = settings.symbols()
+    if not free and not fixed_syms:
+        raise ValueError("UNIVERSE is empty (fixed 模式需要 UNIVERSE)")
+
+    universe = set(fixed_syms) if not free else set()
+    assistant_dirs: list[Path] = []
+    panel = price_df
+    start = settings.start_date
+    end = settings.end_date
+    cache_dir = settings.data_dir
+
+    dates = sorted(panel.index.unique())
+    portfolio = Portfolio(
+        cash=float(settings.initial_capital),
+        fee_rate=float(settings.commission_rate),
+    )
+    snapshots: list[EquitySnapshot] = []
+
+    rebalance_every = max(1, settings.rebalance_every_days)
+    first_allocation_done = False
+
+    for i, ts in enumerate(dates):
+        d = ts.date() if hasattr(ts, "date") else pd.Timestamp(ts).date()
+        ts_pd = pd.Timestamp(ts)
+
+        panel = ensure_panel_has_symbols(panel, list(portfolio.positions.keys()), start, end, cache_dir)
+        if not free and fixed_syms:
+            panel = ensure_panel_has_symbols(panel, fixed_syms, start, end, cache_dir)
+        panel = ensure_panel_has_symbols(
+            panel,
+            settings.reference_benchmark_symbols(),
+            start,
+            end,
+            cache_dir,
+        )
+
+        prices = latest_row(panel, ts_pd)
+
+        if settings.strategy_mode.strip().lower() == "buy_hold":
+            if not first_allocation_done and prices:
+                if not fixed_syms:
+                    raise ValueError("buy_hold 需要配置 UNIVERSE 作为建仓标的")
+                panel = ensure_panel_has_symbols(panel, fixed_syms, start, end, cache_dir)
+                prices = latest_row(panel, ts_pd)
+                _initial_buy_hold(
+                    portfolio,
+                    prices,
+                    fixed_syms,
+                    d,
+                    lot_size=int(settings.lot_size),
+                )
+                first_allocation_done = True
+        elif i % rebalance_every == 0 and prices:
+            if settings.strategy_mode.strip().lower() == "llm":
+                cal = settings.calendar_symbol.strip().upper()
+                bms = settings.reference_benchmark_symbols()
+                others = list(
+                    dict.fromkeys([*portfolio.positions.keys(), *fixed_syms, cal])
+                )
+                others = [w for w in others if w and w not in set(bms)]
+                watch_trimmed = bms + others[: max(0, 27 - len(bms))]
+                candidate_symbols: list[str] = []
+                candidate_text = ""
+                auto_quotes: dict[str, float] = {}
+
+                panel = ensure_panel_has_symbols(panel, watch_trimmed, start, end, cache_dir)
+                if free:
+                    scan_syms = settings.market_scan_symbols()
+                    if scan_syms:
+                        panel = ensure_panel_has_symbols(panel, scan_syms, start, end, cache_dir)
+                        candidate_symbols, candidate_text = _build_candidate_pool(
+                            panel,
+                            scan_syms,
+                            ts_pd,
+                            top_n=max(5, int(settings.market_candidates_top_n)),
+                        )
+                        if candidate_text:
+                            strict_mode = bool(settings.free_selection_enforce_candidates)
+                            candidate_text = (
+                                f"strict_mode={'true' if strict_mode else 'false'}"
+                                "（strict=true 时仅允许候选池买入；卖出现有持仓不受限）\n"
+                                + candidate_text
+                            )
+                    else:
+                        candidate_symbols, candidate_text, auto_quotes = scan_cn_candidates_with_akshare(
+                            max(5, int(settings.market_candidates_top_n)),
+                            retries=max(1, int(settings.market_scan_retries)),
+                            cache_file=settings.data_dir / "market_scan_cache_cn.json",
+                            cache_max_age_min=max(1, int(settings.market_scan_cache_max_age_min)),
+                            http_proxy=settings.market_scan_http_proxy,
+                            https_proxy=settings.market_scan_https_proxy,
+                            no_proxy=settings.market_scan_no_proxy,
+                            probe_url=settings.market_scan_probe_url,
+                            probe_timeout_sec=float(settings.market_scan_probe_timeout_sec),
+                        )
+                        if not candidate_symbols:
+                            fallback_scan = [
+                                s
+                                for s in list(dict.fromkeys([*watch_trimmed, *list(portfolio.positions.keys())]))
+                                if s not in set(bms)
+                            ]
+                            candidate_symbols, fallback_text = _build_candidate_pool(
+                                panel,
+                                fallback_scan,
+                                ts_pd,
+                                top_n=max(5, int(settings.market_candidates_top_n)),
+                            )
+                            if candidate_symbols and fallback_text:
+                                strict_mode = bool(settings.free_selection_enforce_candidates)
+                                candidate_text = (
+                                    f"strict_mode={'true' if strict_mode else 'false'}"
+                                    "（strict=true 时仅允许候选池买入；卖出现有持仓不受限）\n"
+                                    "source=fallback_local_panel（自动扫描网络失败，使用本地行情池排序）\n"
+                                    + fallback_text
+                                )
+                prices = latest_row(panel, ts_pd)
+                recent = _fmt_recent_bars(panel, watch_trimmed, ts_pd)
+                bench_text = format_benchmark_prices(prices, bms)
+                equity_mtm = portfolio.equity(prices)
+                intraday_quotes_text = ""
+                if settings.intraday_quote_enabled:
+                    probe_syms = list(
+                        dict.fromkeys(
+                            [
+                                *candidate_symbols[: min(20, len(candidate_symbols))],
+                                *watch_trimmed,
+                                *list(portfolio.positions.keys()),
+                            ]
+                        )
+                    )
+                    intraday_quotes = fetch_intraday_last_prices(
+                        probe_syms,
+                        period=settings.intraday_quote_period,
+                        interval=settings.intraday_quote_interval,
+                    )
+                    if free and not settings.market_scan_symbols() and auto_quotes:
+                        intraday_quotes.update(auto_quotes)
+                    if intraday_quotes:
+                        intraday_quotes_text = json.dumps(intraday_quotes, ensure_ascii=False)
+                ext_ctx = fetch_external_context(
+                    settings,
+                    decision_day=str(d),
+                    symbols=watch_trimmed,
+                    positions=dict(portfolio.positions),
+                    cash=portfolio.cash,
+                    equity=equity_mtm,
+                    benchmarks=bms,
+                )
+
+                intraday_bundle = ""
+                if settings.intraday_assistant_enabled():
+                    assistant_watchlist = watch_trimmed
+                    if free and candidate_symbols:
+                        assistant_watchlist = list(
+                            dict.fromkeys([*candidate_symbols[:15], *watch_trimmed])
+                        )
+                        panel = ensure_panel_has_symbols(
+                            panel,
+                            assistant_watchlist,
+                            start,
+                            end,
+                            cache_dir,
+                        )
+                    intraday_bundle, asst_dir = run_intraday_assistant_for_day(
+                        settings,
+                        panel=panel,
+                        ts=ts_pd,
+                        decision_day=d,
+                        watchlist=assistant_watchlist,
+                        portfolio=portfolio,
+                        prices=prices,
+                        benchmarks=bms,
+                    )
+                    assistant_dirs.append(asst_dir)
+
+                user = build_user_prompt(
+                    watchlist=watch_trimmed,
+                    free_selection=free,
+                    day=str(d),
+                    cash=portfolio.cash,
+                    equity=equity_mtm,
+                    positions=dict(portfolio.positions),
+                    prices=prices,
+                    initial_capital=float(settings.initial_capital),
+                    benchmark_prices_text=bench_text,
+                    recent_bars=recent,
+                    candidate_pool_text=candidate_text,
+                    intraday_quotes_text=intraday_quotes_text,
+                    external_context_text=ext_ctx,
+                    intraday_assistant_text=intraday_bundle,
+                    lot_size=int(settings.lot_size),
+                    max_position_fraction=float(settings.max_position_fraction),
+                    commission_rate=float(settings.commission_rate),
+                    rebalance_every_days=int(settings.rebalance_every_days),
+                )
+                try:
+                    decision = deepseek_decision_sync(
+                        settings,
+                        system_prompt=system_prompt_for(settings.selection_mode),
+                        user_prompt=user,
+                    )
+                    actions = decision.get("actions") if isinstance(decision, dict) else []
+                    if isinstance(actions, list):
+                        executable_actions = actions
+                        if (
+                            free
+                            and bool(settings.free_selection_enforce_candidates)
+                        ):
+                            cand_set = set(candidate_symbols)
+                            hold_set = set(portfolio.positions.keys())
+                            executable_actions = []
+                            for a in actions:
+                                sym = str(a.get("symbol", "")).upper().strip()
+                                if not sym:
+                                    continue
+                                side = str(a.get("side", "")).lower().strip()
+                                if side == "sell":
+                                    if sym in hold_set:
+                                        executable_actions.append(a)
+                                    continue
+                                if side == "buy" and sym in cand_set:
+                                    executable_actions.append(a)
+                        action_syms: list[str] = []
+                        for a in executable_actions:
+                            s = str(a.get("symbol", "")).upper().strip()
+                            if s:
+                                action_syms.append(s)
+                        panel = ensure_panel_has_symbols(panel, action_syms, start, end, cache_dir)
+                        prices = latest_row(panel, ts_pd)
+                        _apply_actions(
+                            portfolio,
+                            executable_actions,
+                            prices,
+                            universe,
+                            d,
+                            settings.max_position_fraction,
+                            int(settings.lot_size),
+                            free_selection=free,
+                        )
+                except Exception:
+                    # 网络/解析失败则本轮不调仓，避免中断整段回测
+                    pass
+
+        eq = portfolio.equity(prices)
+        snapshots.append(
+            EquitySnapshot(
+                day=d,
+                cash=portfolio.cash,
+                equity=eq,
+                positions=dict(portfolio.positions),
+            )
+        )
+
+    return portfolio, snapshots, assistant_dirs
