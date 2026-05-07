@@ -161,6 +161,31 @@ def _compose_article_user_prompt(
     )
 
 
+def _convert_inline_refs_to_links(article_text: str, gather: dict[str, Any]) -> str:
+    """Convert inline [E14][E15] references to clickable markdown links with brackets visible."""
+    headlines = gather.get("rss_headlines") or []
+    if not isinstance(headlines, list) or not headlines:
+        return article_text
+    
+    eid_to_link = {}
+    for i, h in enumerate(headlines, start=1):
+        eid = f"E{i:02d}"
+        link = str(h.get("link", "")).strip()
+        if link:
+            eid_to_link[eid] = link
+    
+    def replace_ref(match):
+        full_match = match.group(0)  # [E01]
+        eid_num = match.group(1)     # 01
+        eid = f"E{eid_num}"
+        if eid in eid_to_link:
+            # 使用 [[E01]](url) 格式，让中括号在显示时保留
+            return f" [[{eid}]]({eid_to_link[eid]})"
+        return full_match
+    
+    return re.sub(r"\[E(\d{2})\]", replace_ref, article_text)
+
+
 def _build_evidence_index_markdown(article_text: str, gather: dict[str, Any], *, max_items: int = 25) -> str:
     """Append EID -> title/link mapping so readers can click-through."""
     headlines = gather.get("rss_headlines") or []
@@ -269,6 +294,9 @@ def run_single_intraday_phase(
     used_fallback = not article_text.strip()
     if used_fallback:
         article_text = _fallback_article(phase_cn, str(decision_day), gather_rec, market_notes)
+    
+    article_text = _convert_inline_refs_to_links(article_text, gather_rec)
+    
     evidence_index = _build_evidence_index_markdown(article_text, gather_rec)
     if evidence_index:
         article_text = article_text.rstrip() + "\n\n" + evidence_index
