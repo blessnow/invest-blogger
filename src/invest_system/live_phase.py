@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -56,14 +56,22 @@ def load_live_portfolio(path: Path, *, initial_capital: float, fee_rate: float) 
         if str(v).strip()
     }
     txs: list[Transaction] = []
+    sh_tz = ZoneInfo("Asia/Shanghai")
     for row in blob.get("transactions") or []:
         if not isinstance(row, dict):
             continue
         ac_before = row.get("avg_cost_before")
         rp = row.get("realized_pnl")
+        ts_str = row.get("timestamp")
+        ts_str = str(ts_str).strip() if ts_str not in (None, "") else None
+        day_obj = date.fromisoformat(str(row["day"]))
+        if ts_str is None:
+            # 旧记录回填：当天 15:00 上海时间，保证排序稳定且下次 save 自动持久化
+            fb = datetime.combine(day_obj, time(15, 0, 0), tzinfo=sh_tz)
+            ts_str = fb.isoformat(timespec="seconds")
         txs.append(
             Transaction(
-                day=date.fromisoformat(str(row["day"])),
+                day=day_obj,
                 symbol=str(row["symbol"]).upper(),
                 side=str(row["side"]).lower(),  # type: ignore[arg-type]
                 shares=float(row["shares"]),
@@ -72,6 +80,7 @@ def load_live_portfolio(path: Path, *, initial_capital: float, fee_rate: float) 
                 cash_after=float(row["cash_after"]),
                 avg_cost_before=float(ac_before) if ac_before not in (None, "") else None,
                 realized_pnl=float(rp) if rp not in (None, "") else None,
+                timestamp=ts_str,
             )
         )
     if not avg_cost and txs and positions:
@@ -128,6 +137,7 @@ def save_live_portfolio(path: Path, portfolio: Portfolio) -> None:
                 "cash_after": t.cash_after,
                 "avg_cost_before": t.avg_cost_before,
                 "realized_pnl": t.realized_pnl,
+                "timestamp": getattr(t, "timestamp", None),
             }
             for t in portfolio.transactions
         ],
@@ -453,6 +463,7 @@ def run_live_intraday_phase(settings: Settings, *, phase_key: str) -> None:
             float(settings.max_position_fraction),
             int(settings.lot_size),
             free_selection=free,
+            ts=now,
         )
     except Exception as exc:
         print(f"[live] DeepSeek/撮合异常（本轮不调仓）：{type(exc).__name__}: {exc}", file=sys.stderr)

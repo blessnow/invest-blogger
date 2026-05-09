@@ -130,6 +130,26 @@ def main(argv: list[str] | None = None) -> None:
             log=log,
         )
 
+    # 启动时对 state.json + transactions.csv 做一次 idempotent 回填升级
+    # （加 timestamp 字段、按时间倒序），让看板立即看到新格式，无需等下一个 phase。
+    try:
+        from invest_system.live_phase import load_live_portfolio, save_live_portfolio
+        from invest_system.transactions_io import write_transactions_csv
+
+        state_path = Path(settings.live_portfolio_state_path)
+        if state_path.is_file():
+            p = load_live_portfolio(
+                state_path,
+                initial_capital=float(settings.initial_capital),
+                fee_rate=float(settings.commission_rate),
+            )
+            save_live_portfolio(state_path, p)
+            prefix = settings.live_equity_csv_prefix.strip() or "live_intraday"
+            write_transactions_csv(p, Path(settings.data_dir) / f"{prefix}_transactions.csv")
+            log.info("startup upgrade: state + transactions.csv refreshed (%d txs)", len(p.transactions))
+    except Exception:
+        log.exception("startup upgrade failed (non-fatal)")
+
     if args.run_now == "cache":
         _cache_janitor_job(settings)
     elif args.run_now:

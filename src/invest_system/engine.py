@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -158,6 +158,7 @@ def _apply_actions(
     lot_size: int,
     *,
     free_selection: bool,
+    ts: datetime | None = None,
 ) -> None:
     sells = [a for a in actions if str(a.get("side", "")).lower() == "sell"]
     buys = [a for a in actions if str(a.get("side", "")).lower() == "buy"]
@@ -181,7 +182,7 @@ def _apply_actions(
         raw_sell = min(want, int(math.floor(held)))
         shares = _lot_floor(raw_sell, lot_size)
         if shares > 0:
-            portfolio.sell(day, sym, float(shares), price)
+            portfolio.sell(day, sym, float(shares), price, ts=ts)
 
     for a in buys:
         sym = str(a.get("symbol", "")).upper().strip()
@@ -200,7 +201,7 @@ def _apply_actions(
             continue
         capped = _cap_buy_shares(portfolio, sym, want, price, max_fraction, prices, lot_size)
         if capped > 0:
-            portfolio.buy(day, sym, float(capped), price)
+            portfolio.buy(day, sym, float(capped), price, ts=ts)
 
 
 def _initial_buy_hold(

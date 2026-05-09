@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 
 
@@ -19,6 +19,9 @@ class Transaction:
     cash_after: float
     avg_cost_before: float | None = None
     realized_pnl: float | None = None
+    #: ISO-8601 时间戳（含时区，例如 "2026-05-09T11:30:14+08:00"）。
+    #: 历史记录可能为 None；序列化/排序时缺失视作 day 当天 15:00 本地时区。
+    timestamp: str | None = None
 
 
 @dataclass
@@ -47,7 +50,15 @@ class Portfolio:
             return 0.0
         return qty * p
 
-    def buy(self, day: date, symbol: str, shares: float, price: float) -> bool:
+    def buy(
+        self,
+        day: date,
+        symbol: str,
+        shares: float,
+        price: float,
+        *,
+        ts: datetime | None = None,
+    ) -> bool:
         if shares <= 0:
             return False
         cost = shares * price
@@ -74,11 +85,20 @@ class Portfolio:
                 cash_after=self.cash,
                 avg_cost_before=old_avg if old_qty > 0 else None,
                 realized_pnl=None,
+                timestamp=ts.isoformat(timespec="seconds") if ts is not None else None,
             )
         )
         return True
 
-    def sell(self, day: date, symbol: str, shares: float, price: float) -> bool:
+    def sell(
+        self,
+        day: date,
+        symbol: str,
+        shares: float,
+        price: float,
+        *,
+        ts: datetime | None = None,
+    ) -> bool:
         if shares <= 0:
             return False
         held = self.positions.get(symbol, 0.0)
@@ -108,6 +128,7 @@ class Portfolio:
                 cash_after=self.cash,
                 avg_cost_before=avg if avg > 0 else None,
                 realized_pnl=realized,
+                timestamp=ts.isoformat(timespec="seconds") if ts is not None else None,
             )
         )
         return True

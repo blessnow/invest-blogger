@@ -1,11 +1,27 @@
 from __future__ import annotations
 
+from datetime import datetime, time
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 
 from invest_system.portfolio import Portfolio
 from invest_system.stock_names import resolve_symbols_to_names
+
+# 历史/缺失 timestamp 的回填基准：当天 15:00 (Asia/Shanghai) —— 收盘附近、不与任一 phase 重合，
+# 仅保证排序时同日交易能"沉到底"，不会乱掉新写入的精确时点。
+_FALLBACK_TIME = time(15, 0, 0)
+_FALLBACK_TZ = ZoneInfo("Asia/Shanghai")
+
+
+def _resolve_ts(t) -> str:
+    """返回 ISO 时间戳；缺失则用 day + 15:00:00+08:00 兜底。"""
+    raw = getattr(t, "timestamp", None)
+    if raw:
+        return str(raw)
+    dt = datetime.combine(t.day, _FALLBACK_TIME, tzinfo=_FALLBACK_TZ)
+    return dt.isoformat(timespec="seconds")
 
 
 def write_transactions_csv(portfolio: Portfolio, path: Path) -> Path:
@@ -15,7 +31,7 @@ def write_transactions_csv(portfolio: Portfolio, path: Path) -> Path:
         cache_file=path.parent / "stock_name_cache.json",
     )
     rows = []
-    for t in portfolio.transactions:
+    for idx, t in enumerate(portfolio.transactions):
         sym_u = t.symbol.upper().strip()
         avg_cost = getattr(t, "avg_cost_before", None)
         realized = getattr(t, "realized_pnl", None)
@@ -30,6 +46,8 @@ def write_transactions_csv(portfolio: Portfolio, path: Path) -> Path:
             realized_pct = realized / (avg_cost * t.shares) * 100.0
         rows.append(
             {
+                "_seq": idx,  # 用于稳定排序
+                "timestamp": _resolve_ts(t),
                 "date": t.day,
                 "symbol": t.symbol,
                 "name": name_map.get(sym_u, ""),
@@ -44,7 +62,13 @@ def write_transactions_csv(portfolio: Portfolio, path: Path) -> Path:
             }
         )
     df = pd.DataFrame(rows)
+    if not df.empty:
+        # 时间倒序（最新在最上）；同时间用插入顺序倒序作为稳定 tie-breaker
+        df["_ts_dt"] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
+        df = df.sort_values(["_ts_dt", "_seq"], ascending=[False, False])
+        df = df.drop(columns=["_ts_dt", "_seq"])
     cols = [
+        "timestamp",
         "date",
         "symbol",
         "name",

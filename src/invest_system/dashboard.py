@@ -293,6 +293,11 @@ def main() -> None:
             st.info("暂无交易记录")
         else:
             display_tx = tx_df.copy()
+            if "timestamp" in display_tx.columns:
+                ts_dt = pd.to_datetime(display_tx["timestamp"], utc=True, errors="coerce")
+                ts_local = ts_dt.dt.tz_convert("Asia/Shanghai")
+                display_tx["时间"] = ts_local.dt.strftime("%Y-%m-%d %H:%M:%S")
+                display_tx["_sort_ts"] = ts_dt
             if "date" in display_tx.columns:
                 display_tx["日期"] = display_tx["date"]
             if "symbol" in display_tx.columns:
@@ -319,7 +324,7 @@ def main() -> None:
             cols_to_show = [
                 col
                 for col in [
-                    "日期",
+                    "时间",
                     "股票代码",
                     "股票名称",
                     "交易类型",
@@ -334,7 +339,11 @@ def main() -> None:
                 if col in display_tx.columns
             ]
 
-            if "日期" in display_tx.columns:
+            if "_sort_ts" in display_tx.columns:
+                display_tx = display_tx.sort_values(
+                    "_sort_ts", ascending=False, kind="mergesort"
+                )
+            elif "日期" in display_tx.columns:
                 display_tx = display_tx.sort_values("日期", ascending=False)
 
             col_cfg = {}
