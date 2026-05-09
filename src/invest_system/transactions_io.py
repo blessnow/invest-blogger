@@ -63,10 +63,9 @@ def write_transactions_csv(portfolio: Portfolio, path: Path) -> Path:
         )
     df = pd.DataFrame(rows)
     if not df.empty:
-        # 时间倒序（最新在最上）；同时间用插入顺序倒序作为稳定 tie-breaker
-        df["_ts_dt"] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
-        df = df.sort_values(["_ts_dt", "_seq"], ascending=[False, False])
-        df = df.drop(columns=["_ts_dt", "_seq"])
+        # 持久化保持原始时序（升序）：累计 buy/sell、对账、回放都依赖这个顺序。
+        # 倒序仅作为展示侧排序（dashboard 用 timestamp desc）。
+        df = df.drop(columns=["_seq"])
     cols = [
         "timestamp",
         "date",

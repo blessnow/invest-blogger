@@ -65,11 +65,20 @@ def _assistant_day_dirs(root: Path) -> list[Path]:
 def _get_current_positions(tx_df: pd.DataFrame) -> pd.DataFrame:
     if tx_df.empty:
         return pd.DataFrame()
-    
+
+    # CSV 是按时间倒序写的（最新在最上），但累加 buy/sell 必须按时间升序，
+    # 否则同一标的会被错算（先 sell 后 buy 的反向遍历会变正持仓）。
+    df = tx_df.copy()
+    if "timestamp" in df.columns:
+        df["_ts"] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
+        df = df.sort_values("_ts", ascending=True, kind="mergesort")
+    elif "date" in df.columns:
+        df = df.sort_values("date", ascending=True, kind="mergesort")
+
     positions = {}
     avg_cost = {}
-    
-    for _, row in tx_df.iterrows():
+
+    for _, row in df.iterrows():
         sym = row.get("symbol", "")
         name = row.get("name", "")
         if not sym:
