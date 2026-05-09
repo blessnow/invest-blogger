@@ -1,0 +1,282 @@
+{
+  "phase": "pre_open",
+  "decision_date": "2026-05-06",
+  "rss_headlines": [
+    {
+      "title": "Justin Wolfers, Cable’s Favorite Economist, Joins the Creator Economy",
+      "link": "https://www.nytimes.com/2026/05/06/business/dealbook/justin-wolfers-media-company.html",
+      "published": "Wed, 06 May 2026 11:05:07 +0000",
+      "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "The New York Times Passes 13 Million Subscribers",
+      "link": "https://www.nytimes.com/2026/05/06/business/media/new-york-times-earnings.html",
+      "published": "Wed, 06 May 2026 11:05:04 +0000",
+      "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "全球半导体Q1销售额近3000亿美元创历史新高！全年有望首破万亿 - 驱动之家",
+      "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9IQzhxWjgzdzFfTlUtVHBNMTdPb2tWVGE0U2J0UnJRLVgyTTVsSFpQb0xtV3RCV1EybVduVUhVc0FNNDNtVnlXNko0YjlTX1NOSXVWM21fdDU?oc=5",
+      "published": "Wed, 06 May 2026 10:59:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "鲟龙科技第五次冲击IPO：三次A股折戟，港股之旅存17.49亿水下隐忧 - 凤凰网财经",
+      "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBPTUVCdUZSb3MxRXFydEljSVkwRGJyN3VaWkcwMUxuYlRsWGV2YWVkWHc2YWVkOGZRRHdyTEl5LWNHdUVHUE1DTTV0cTRNQlVW?oc=5",
+      "published": "Wed, 06 May 2026 10:53:49 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "ETF英雄汇：中韩半导体ETF华泰柏瑞(513310.SH)领涨、纳指科技ETF景顺(159509.SZ)溢价明显-20260506 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9raExUdHI0RlhIR08tTGdIeEJ0S0g4bU82NS1ROVBaaHFWMVo2cmVRVS14VVhBV08tYXpGYW9SUlk2Rjh1NlhLVkIyRk1RMjR4UU12Mlh5ZFBHYkFKbkdpaGZXbkdmUTMzay03UUtqTmFJQU5qeEhDQw?oc=5",
+      "published": "Wed, 06 May 2026 10:41:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "大模型之家2026年4月热力榜：DeepSeek V4发布，国产算力再度掀起“成本风暴” - thepaper.cn",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5QQUtkMWlITWpROUhpU1N3VHExVUN4V2VCTVFDM1FodHF6Y2pudFYwMW1fY1l2Sml5Qks3U2Q0RlB3TDQ0Vk05X1JtaHdsMVQ0ZjI0RFJBNy13QkN4cTlZVA?oc=5",
+      "published": "Wed, 06 May 2026 10:20:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "外围AI热潮点燃A股：算力、存力全面爆发，沪苏锡成核心阵地 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9YdnU5RkR5RXY0SG5JVDBQak5wb19TY2RGY3N1bjIxbEdFWmVSWDFidDJSMDRPazVZRjRWYmI2cEcwSTFyWENvWFlPQUR6OXVsY3JCSlByMExpcW1BLTBSMVpUZzFyZnhVb2ZJNmpB?oc=5",
+      "published": "Wed, 06 May 2026 10:18:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "A股总市值117万亿创历史新高，这是哪七家“万亿俱乐部”撑起的 - thepaper.cn",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE95dVFXajBzbTBGUy1RcHVaMmg4YmxQUkllRU81NDdEX18zaWlRV1JuS3FQY0pRU1lnQjI2SmtlUzJDTXE5dWJCRDNkZ1ZLbTVsaG5jU2t4VlFRSkhSV2c?oc=5",
+      "published": "Wed, 06 May 2026 10:12:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "5月6日北向资金最新动向（附十大成交股） - 东方财富",
+      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFBwNTVrMWcwcldWdmhCRF9kUkptNnBMNHlJQ3o5bmRXMlZUVUFSWG1wQVE1RW44aTJjTFZieXhRNXhsemdkZUR2ME5KdXlTQTlzMi1mUTdlWXdLSENNc2VWc0JObzgxdw?oc=5",
+      "published": "Wed, 06 May 2026 10:04:01 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8C%97%E5%90%91%E8%B5%84%E9%87%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "工商银行：2025年年度A股每股派发现金股息0.1689元 股权登记日为5月12日 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFBzTjhqUFBoYkM4TVNmaDB3ZGd6Z1d3a05vaktUZWViQktsNG40UTFVS2RTWi1XM0Q4OVktRWtySDIwYmNpa0RYeWtyajZHeXM?oc=5",
+      "published": "Wed, 06 May 2026 10:03:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "疯狂行情！存储芯片板块集体涨停 - 电子工程专辑",
+      "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9YQ1ZHQ28zNXdOUm1FQ0dhYms5UWNzbkhFX0ZvY2hYRGp2eWMzZVRIX0o2VC1TYnppWlJ0bTY1RzdmajAyY2ROcHpMdGQ3NXF5TWEw?oc=5",
+      "published": "Wed, 06 May 2026 09:50:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "数据复盘丨存储芯片、算力等概念走强 173股获主力资金净流入超1亿元 - 证券时报",
+      "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTFB6M1RwMnEtQURIZllZZ2FCQWdsRW56VU94RExSNnNyeFZZZXpGS3BzcTZVYjk3T2tfanFwRTc2UU9aeFBYUDl1ajNIcFhIdG5wOG5Ob2dIYnNzckts?oc=5",
+      "published": "Wed, 06 May 2026 09:31:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "American Factories Lag in Adopting A.I. This Drugmaker Is an Exception.",
+      "link": "https://www.nytimes.com/2026/05/06/business/ai-bristol-myers-squibb-drugs.html",
+      "published": "Wed, 06 May 2026 09:02:03 +0000",
+      "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "谷歌酝酿AI订阅新层级Ultra Lite 应对算力需求激增 - 品玩",
+      "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTFA2RVYtZWtlclRiNXZxYmJtbDZRMk9xRzE2Y2VXRXFMc1J3N1p6Nld3NXB4TDBMN1J5OEZYalhKdTA3dWVCU3ZMaw?oc=5",
+      "published": "Wed, 06 May 2026 08:53:52 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "港股半导体板块，集体爆发 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE4xMkVjUkhvQXEtMHNkeDA4UC1yYnBXMWhqMGlmUVd4TWp3Nnk0MW5keHlOOW5aaC1CdV9tYXZWdHNHR3p3S0R3VllwaFR4MmMxSFpOWWE2amlXeDEwa2I1WW5pSjJIWUpmdWRMVTZ3?oc=5",
+      "published": "Wed, 06 May 2026 08:32:38 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "A股早盘存储芯片板块大涨，科创50指数涨超9% - thepaper.cn",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5zX3MycFZYaGFOQXBjcXRRY3ZHSmtzY09YLUVDNWh3cTQxNUJpWWdWMmt4dF9qcWhZSGFlVS1makRUcFlLcF9YTVJid0YtSHRpUlQ0eWpkQ1NlRnZPby1SYw?oc=5",
+      "published": "Wed, 06 May 2026 02:07:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "沪深300指数期货上涨2.0%至4,857.00点。 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTFBkcXc2b3lxVy1QQW9iRFE4UnpNRGlkMHIwVFJlMDJKLTNQbE9PVG1PQ2F4ckdJZnpyTERZcmpQVjlzaG9pcXlyaEdkOA?oc=5",
+      "published": "Wed, 06 May 2026 02:03:29 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "沪深两市成交额突破1万亿元 - Jiemian.com",
+      "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9xUFlNbFVOZHozUlIzd0VMbVJ4cGFnekRlOWdBaENrZTlEcDNIMjdxbmVCVUFJc0k0QnBfS2h6WnB0QXJObXRhUWNyUDJxXzM2cEQ2T0xla2Y?oc=5",
+      "published": "Wed, 06 May 2026 01:59:57 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "4月30日沪深300ETF鹏华（159673）份额减少1800.00万份，最新份额14.08亿份，最新规模18.59亿元 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQQWx6NUl0aXhrLUhhMDc2MThqR2prSnB3VFl0cmh4Q3p2MDI5UGZOYkdUcm1vTU9CcFRXUlFqTjBmNjZobndTaU16UXdWcHVDU2pPSTNsTDI4LWRwM0hkZWZvTUQ2WUlQcWNrS2QyeVJzbWRBVER5SHN0bFp3RjVVZmFGeUkxaFJyYzJPNk45b2puMmEzaDV3ZS1hcw?oc=5",
+      "published": "Wed, 06 May 2026 01:10:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "民生政策 落地有声丨“卡友”在路上有了“家” - 新华网",
+      "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNTkRYbS1LbDZuUS00eE9XYXF5ZWhkcDZUeWZpMndJYjJldEZ6LXdob2tZby11N2tUMV8xRTJiTC1xbm1udjdPcXlGeXdlVXlnd1NJSl94MjV5Nk5oRHNzSlY4ejE0TjNhTGVCX3RyLUc0Z2R6bURVQURqV1Q1WjN1WTdrWQ?oc=5",
+      "published": "Tue, 05 May 2026 13:44:49 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%94%BF%E7%AD%96&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "机构风向标 | 澜起科技(688008)2026年一季度已披露持股减少机构超170家 - 东方财富",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1fbDB4VTNxUjd3bVIwTVdwcFhtLVM3bzlqTHEtV1RKSHBHbzRzUVlxQVcwLUJWOUUtY0FBcWZDZXEtR29mSUswVkVrUHU0Vno1TGFoWElxeGFGS0tIak1BdQ?oc=5",
+      "published": "Fri, 01 May 2026 00:49:28 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=688008&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
+      "link": "https://www.wsj.com/articles/nikkei-may-rise-as-weak-yen-raises-earnings-hopes-776a8056?mod=rss_markets_main",
+      "published": "Mon, 27 Jan 2025 14:26:00 -0500",
+      "source_feed": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "Comex Gold, Silver Settle Lower",
+      "link": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
+      "published": "Mon, 27 Jan 2025 14:01:00 -0500",
+      "source_feed": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "DeepSeek Won't Sink U.S. AI Titans",
+      "link": "https://www.wsj.com/articles/deepseek-us-ai-stocks-nvidia-broadcom-6cdfae81?mod=rss_markets_main",
+      "published": "Mon, 27 Jan 2025 13:12:00 -0500",
+      "source_feed": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "body_excerpt": ""
+    }
+  ],
+  "news_digest": {
+    "sentiment": "risk_on",
+    "sentiment_score": 4,
+    "topic_headlines": {
+      "macro_policy": [
+        {
+          "title": "民生政策 落地有声丨“卡友”在路上有了“家” - 新华网",
+          "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNTkRYbS1LbDZuUS00eE9XYXF5ZWhkcDZUeWZpMndJYjJldEZ6LXdob2tZby11N2tUMV8xRTJiTC1xbm1udjdPcXlGeXdlVXlnd1NJSl94MjV5Nk5oRHNzSlY4ejE0TjNhTGVCX3RyLUc0Z2R6bURVQURqV1Q1WjN1WTdrWQ?oc=5",
+          "published": "Tue, 05 May 2026 13:44:49 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E6%94%BF%E7%AD%96&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ],
+      "market_flow": [
+        {
+          "title": "鲟龙科技第五次冲击IPO：三次A股折戟，港股之旅存17.49亿水下隐忧 - 凤凰网财经",
+          "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBPTUVCdUZSb3MxRXFydEljSVkwRGJyN3VaWkcwMUxuYlRsWGV2YWVkWHc2YWVkOGZRRHdyTEl5LWNHdUVHUE1DTTV0cTRNQlVW?oc=5",
+          "published": "Wed, 06 May 2026 10:53:49 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "外围AI热潮点燃A股：算力、存力全面爆发，沪苏锡成核心阵地 - 新浪财经",
+          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9YdnU5RkR5RXY0SG5JVDBQak5wb19TY2RGY3N1bjIxbEdFWmVSWDFidDJSMDRPazVZRjRWYmI2cEcwSTFyWENvWFlPQUR6OXVsY3JCSlByMExpcW1BLTBSMVpUZzFyZnhVb2ZJNmpB?oc=5",
+          "published": "Wed, 06 May 2026 10:18:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "A股总市值117万亿创历史新高，这是哪七家“万亿俱乐部”撑起的 - thepaper.cn",
+          "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE95dVFXajBzbTBGUy1RcHVaMmg4YmxQUkllRU81NDdEX18zaWlRV1JuS3FQY0pRU1lnQjI2SmtlUzJDTXE5dWJCRDNkZ1ZLbTVsaG5jU2t4VlFRSkhSV2c?oc=5",
+          "published": "Wed, 06 May 2026 10:12:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "5月6日北向资金最新动向（附十大成交股） - 东方财富",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFBwNTVrMWcwcldWdmhCRF9kUkptNnBMNHlJQ3o5bmRXMlZUVUFSWG1wQVE1RW44aTJjTFZieXhRNXhsemdkZUR2ME5KdXlTQTlzMi1mUTdlWXdLSENNc2VWc0JObzgxdw?oc=5",
+          "published": "Wed, 06 May 2026 10:04:01 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8C%97%E5%90%91%E8%B5%84%E9%87%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ],
+      "tech_compute": [
+        {
+          "title": "全球半导体Q1销售额近3000亿美元创历史新高！全年有望首破万亿 - 驱动之家",
+          "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9IQzhxWjgzdzFfTlUtVHBNMTdPb2tWVGE0U2J0UnJRLVgyTTVsSFpQb0xtV3RCV1EybVduVUhVc0FNNDNtVnlXNko0YjlTX1NOSXVWM21fdDU?oc=5",
+          "published": "Wed, 06 May 2026 10:59:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "ETF英雄汇：中韩半导体ETF华泰柏瑞(513310.SH)领涨、纳指科技ETF景顺(159509.SZ)溢价明显-20260506 - 新浪财经",
+          "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9raExUdHI0RlhIR08tTGdIeEJ0S0g4bU82NS1ROVBaaHFWMVo2cmVRVS14VVhBV08tYXpGYW9SUlk2Rjh1NlhLVkIyRk1RMjR4UU12Mlh5ZFBHYkFKbkdpaGZXbkdmUTMzay03UUtqTmFJQU5qeEhDQw?oc=5",
+          "published": "Wed, 06 May 2026 10:41:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "大模型之家2026年4月热力榜：DeepSeek V4发布，国产算力再度掀起“成本风暴” - thepaper.cn",
+          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5QQUtkMWlITWpROUhpU1N3VHExVUN4V2VCTVFDM1FodHF6Y2pudFYwMW1fY1l2Sml5Qks3U2Q0RlB3TDQ0Vk05X1JtaHdsMVQ0ZjI0RFJBNy13QkN4cTlZVA?oc=5",
+          "published": "Wed, 06 May 2026 10:20:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "疯狂行情！存储芯片板块集体涨停 - 电子工程专辑",
+          "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9YQ1ZHQ28zNXdOUm1FQ0dhYms5UWNzbkhFX0ZvY2hYRGp2eWMzZVRIX0o2VC1TYnppWlJ0bTY1RzdmajAyY2ROcHpMdGQ3NXF5TWEw?oc=5",
+          "published": "Wed, 06 May 2026 09:50:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ],
+      "other": [
+        {
+          "title": "Justin Wolfers, Cable’s Favorite Economist, Joins the Creator Economy",
+          "link": "https://www.nytimes.com/2026/05/06/business/dealbook/justin-wolfers-media-company.html",
+          "published": "Wed, 06 May 2026 11:05:07 +0000",
+          "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+          "body_excerpt": ""
+        },
+        {
+          "title": "The New York Times Passes 13 Million Subscribers",
+          "link": "https://www.nytimes.com/2026/05/06/business/media/new-york-times-earnings.html",
+          "published": "Wed, 06 May 2026 11:05:04 +0000",
+          "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+          "body_excerpt": ""
+        },
+        {
+          "title": "American Factories Lag in Adopting A.I. This Drugmaker Is an Exception.",
+          "link": "https://www.nytimes.com/2026/05/06/business/ai-bristol-myers-squibb-drugs.html",
+          "published": "Wed, 06 May 2026 09:02:03 +0000",
+          "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+          "body_excerpt": ""
+        },
+        {
+          "title": "机构风向标 | 澜起科技(688008)2026年一季度已披露持股减少机构超170家 - 东方财富",
+          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1fbDB4VTNxUjd3bVIwTVdwcFhtLVM3bzlqTHEtV1RKSHBHbzRzUVlxQVcwLUJWOUUtY0FBcWZDZXEtR29mSUswVkVrUHU0Vno1TGFoWElxeGFGS0tIak1BdQ?oc=5",
+          "published": "Fri, 01 May 2026 00:49:28 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=688008&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ]
+    },
+    "total_items": 24
+  },
+  "gather_url_summary": "",
+  "note": "已按主题聚合并做情绪粗评分；历史回测场景可能与决策日不完全对齐。"
+}

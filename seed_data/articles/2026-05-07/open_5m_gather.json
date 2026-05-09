@@ -1,0 +1,282 @@
+{
+  "phase": "open_5m",
+  "decision_date": "2026-05-07",
+  "rss_headlines": [
+    {
+      "title": "Anthropic’s C.E.O. Says It Could Grow by 80 Times This Year",
+      "link": "https://www.nytimes.com/2026/05/06/technology/anthropic-ceo-ai-growth.html",
+      "published": "Thu, 07 May 2026 01:09:53 +0000",
+      "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "从横琴到全球：一微半导体千万级商业化应用经验助力VAKY大鲨鱼美容仪腾飞 - 中华网",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE9DTTBZNmlYRi11Ri16c1dBSjN3b0JVVjg1QllEMF9HM3VDMG1vcG9aNWZ0N1FlU1g4MmhJU2tTdHI5QzFjQ01hRDNNODFtVnk0UEU4N1doMHpuOW1TdkE?oc=5",
+      "published": "Thu, 07 May 2026 01:09:37 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "多点开花“五一”假日消费市场活力迸发：政策引领激发潜力 - 中华网",
+      "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9TOXI3eG5KRGZ1amluVXNhMVpwVTBfZWM0SW9uX0lqRnV4ZVlmbDk1a1EyQ0lJcTlJQ2hkR0ZIN2JPVFRKQnpmUzJUdEV6VFdwWExTUnpYVk9xc1ZIMmdkdHk5RXY2R3BhVmViYktQZlI?oc=5",
+      "published": "Thu, 07 May 2026 00:59:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%94%BF%E7%AD%96&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "国产算力链大爆发_新浪新闻 - 新浪网",
+      "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBHdEpXWlJ0TWdZMVNQUmZiUC0yNTFpazJON1gtNF9ua0V1alh3cHBaRFJheGswdjU1MkNsOFF6MENkTXA5SEcteC0wR2RuUkxuS3RlV1FnQVpQOU9SZGtYVDB0VQ?oc=5",
+      "published": "Thu, 07 May 2026 00:57:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "券商把脉5月策略： 外部风险逐步减弱 A股有望剑指前高 - thepaper.cn",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1kRlUybmVEbUNlUGptekVsZWVneUhnc1dFV0lSSDFoVDlKcDFLWkxtMUJ6QzNGaGx0dk5fSnRmYnEwR1djRE16OEhnclBiMHpjampZRVUtUjhabUtNWnc?oc=5",
+      "published": "Thu, 07 May 2026 00:43:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "成本普涨、盈利分化！半导体行业涨价潮影响见端倪 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE8yMzFCSWwwMGI4R3RKSFNCZVJtbHllSFZrbzJ4VFAwSDlwLUliZDBxazZ2U0FrNHpoQjgtOEk5dkt6VEVFVFZfdTR1YllsZmZzUF9DUDJTZHA4RXozSXV4VGZrLU9McXhjNjVHSlZsNHA0MHdzS1E?oc=5",
+      "published": "Thu, 07 May 2026 00:04:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "一季度利润最高暴涨超7倍 存储巨头集体赚翻了 - 证券时报",
+      "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE9QUFk4OFAtdXU2VHhSNWl2SXpFOEFzalRNaXhMbUVzT2pWTFV4c2psV1g0ZHZyN2R2M2w4XzdmWWNzN2RZZENtRy1QWWlILTdBMmhtM0x3M1RpNWRI?oc=5",
+      "published": "Wed, 06 May 2026 23:51:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "存储芯片板块“狂欢”，全球巨头齐创历史新高 - 同花顺",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTFAxUng3Mm1LSzdxSFR5bmhGTXRoT243dC1QVlJqUXowZVpac3A3QWZzRVh0TVEzMVJvQ19CWThmRjNjWDMyMnlaaGdBMzlxQzVhLTA0ZWZPTjF5ZXdCcVE?oc=5",
+      "published": "Wed, 06 May 2026 23:09:07 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "JPMorgan Tried to Settle Harassment Accusations Against Executive",
+      "link": "https://www.nytimes.com/2026/05/06/business/jpmorgan-rana-hajdini-harassment-lawsuit.html",
+      "published": "Wed, 06 May 2026 22:53:55 +0000",
+      "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "前四月A股发审全景：过会率持续高企，北交所成绝对“主力” - 凤凰网",
+      "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE8yYk1aeFRGb2Z4RmgtQk9pOEhNN3l2ZzVYUmoxWEM4bGkxYm91aHljd1F2RkN2Z1c4WjBGbVBaRmkwcGNETzhLbkVLWUxrcmxC?oc=5",
+      "published": "Wed, 06 May 2026 22:50:01 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "A股目标涨幅7%和10%_新浪新闻 - 新浪网",
+      "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBsTmFoR2dSQi1TZF83aHZlUmlqdllwd0Y5bXFiN2tNWXFLa3VBWkdfWnNqSXdEQkNKbDdpVUNWd0VBQjhhcmR6U0FvUjZMNUxRTUE2SVZPZG1rSkFUUFZxTUVOOA?oc=5",
+      "published": "Wed, 06 May 2026 22:49:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "产业趋势和自主可控共振 机构强力掘金半导体板块 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE9VTlBuOGxOQW9Yall1SXJuSlZvVXhHNGhIbmNUbXR5Tmh0STI4WlNXWkU4bnAxN2g1aDNqWEVXQUhaVW1ZOUNlWXpMZw?oc=5",
+      "published": "Wed, 06 May 2026 22:35:47 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "Anthropic CEO：第一季度实现80倍增长，解释了“算力困难” - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTE9tVXpzWV8zWEFQQXN4X3FLZERyNERzNVFOWlNUU0drQU5JTnRidmRVMmFUbzZKSnhOaTZpQlJ2Mm1HcVlma0dhUVVESVJwa21JMzM5NXV2T2NLNVVHa043bVhnem5MSl8wcWw4NUEzR3JXVzRmaE0zeUl3?oc=5",
+      "published": "Wed, 06 May 2026 22:08:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "GameStop’s CEO Ryan Cohen Baffles Fans With eBay Bid",
+      "link": "https://www.nytimes.com/2026/05/06/business/ebay-gamestop-deal-ryan-cohen.html",
+      "published": "Wed, 06 May 2026 20:27:54 +0000",
+      "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "超10亿元！机构抢筹存储芯片 - 东方财富",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE52MVpZN1VBZjh4WTJkb3FkaVVCT2EzWERvdnNOOF8tT3RsUVlVQzdPWkZJSG1HRlpzZE9XbHdQUXdRZkNDVXJ6OFd4NnJfdkdjMkwwcElLdEpNeXRDOVBQTg?oc=5",
+      "published": "Wed, 06 May 2026 16:35:33 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "《江西省工业领域算力服务和数据筑基三年行动方案（2026—2028年）》印发 - 凤凰网江西",
+      "link": "https://news.google.com/rss/articles/CBMiSkFVX3lxTFAzdWNsQVU0VlpkMFZaSlR5azBXTTRoelNLMHozSW55d0NCRE1lMmZ6V2xPN21nbGw3VHdUM3U1ZENob2RLQTlXSXJB?oc=5",
+      "published": "Wed, 06 May 2026 13:45:13 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "19.35亿资金抢筹江波龙，2.75亿资金出逃粤桂股份丨龙虎榜 - 21财经",
+      "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQR0VVWm1PQ3BxLW5aZXJtdEVwZ2JqWTZxc3pNNHZXWUxvYTRfWExPQ2pCWk9PTEs3bHBDaTMxaFJ3Nzk2TmtWTTdVcHFWazc5XzlncmZJQTNhbHpWUV9rdzMxaExGWnJLUG9HaDRxa2lzdGVGMEI4WjFHakxDNXZwcGNzNHh4T3ZPclZob0RTbw?oc=5",
+      "published": "Wed, 06 May 2026 10:52:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8C%97%E5%90%91%E8%B5%84%E9%87%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "大唐发电(601991)龙虎榜数据(05-06) - 东方财富",
+      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9BY0RRUmc2NFZEbmFSa21uMVhoRGVhNEQyR0dJaTI3OE0yS1RYazNXd2t6SEFqUmRVY3hiS2FlcnN2UktELXJKTkliVU5ud050NW9yYVQ0M0x0eWxzR1prSnNYLXBOUQ?oc=5",
+      "published": "Wed, 06 May 2026 09:08:41 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=601991&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "沪深两市成交额突破2.5万亿元 - Jiemian.com",
+      "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE90cTRpTWlISlpvR2dnQVNDd1ZLMTlnVVZzbjBwd2ltY1d1eGotbDNpdEpjbzdQNktpOTdad2tNRXprUmMzcmRMenJnNS16dlp6MnlfT3lFcWs?oc=5",
+      "published": "Wed, 06 May 2026 05:40:57 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "沪深两市成交额超1万亿元，较上日此时放量1227亿元。 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5IcHh2MzRQdm0tczB2VGZLTXF6QUhfc0lBZ04zbWdhUUFTM0llZnR5M2VMZmFqalRyMXdIa2ZZcEppUkktUzFDVF9nbw?oc=5",
+      "published": "Wed, 06 May 2026 01:54:07 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "4月30日沪深300ETF鹏华（159673）份额减少1800.00万份，最新份额14.08亿份，最新规模18.59亿元 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQQWx6NUl0aXhrLUhhMDc2MThqR2prSnB3VFl0cmh4Q3p2MDI5UGZOYkdUcm1vTU9CcFRXUlFqTjBmNjZobndTaU16UXdWcHVDU2pPSTNsTDI4LWRwM0hkZWZvTUQ2WUlQcWNrS2QyeVJzbWRBVER5SHN0bFp3RjVVZmFGeUkxaFJyYzJPNk45b2puMmEzaDV3ZS1hcw?oc=5",
+      "published": "Wed, 06 May 2026 01:10:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
+      "link": "https://www.wsj.com/articles/nikkei-may-rise-as-weak-yen-raises-earnings-hopes-776a8056?mod=rss_markets_main",
+      "published": "Mon, 27 Jan 2025 14:26:00 -0500",
+      "source_feed": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "Comex Gold, Silver Settle Lower",
+      "link": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
+      "published": "Mon, 27 Jan 2025 14:01:00 -0500",
+      "source_feed": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "DeepSeek Won't Sink U.S. AI Titans",
+      "link": "https://www.wsj.com/articles/deepseek-us-ai-stocks-nvidia-broadcom-6cdfae81?mod=rss_markets_main",
+      "published": "Mon, 27 Jan 2025 13:12:00 -0500",
+      "source_feed": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "body_excerpt": ""
+    }
+  ],
+  "news_digest": {
+    "sentiment": "risk_on",
+    "sentiment_score": 3,
+    "topic_headlines": {
+      "macro_policy": [
+        {
+          "title": "多点开花“五一”假日消费市场活力迸发：政策引领激发潜力 - 中华网",
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9TOXI3eG5KRGZ1amluVXNhMVpwVTBfZWM0SW9uX0lqRnV4ZVlmbDk1a1EyQ0lJcTlJQ2hkR0ZIN2JPVFRKQnpmUzJUdEV6VFdwWExTUnpYVk9xc1ZIMmdkdHk5RXY2R3BhVmViYktQZlI?oc=5",
+          "published": "Thu, 07 May 2026 00:59:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E6%94%BF%E7%AD%96&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ],
+      "market_flow": [
+        {
+          "title": "券商把脉5月策略： 外部风险逐步减弱 A股有望剑指前高 - thepaper.cn",
+          "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1kRlUybmVEbUNlUGptekVsZWVneUhnc1dFV0lSSDFoVDlKcDFLWkxtMUJ6QzNGaGx0dk5fSnRmYnEwR1djRE16OEhnclBiMHpjampZRVUtUjhabUtNWnc?oc=5",
+          "published": "Thu, 07 May 2026 00:43:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "前四月A股发审全景：过会率持续高企，北交所成绝对“主力” - 凤凰网",
+          "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE8yYk1aeFRGb2Z4RmgtQk9pOEhNN3l2ZzVYUmoxWEM4bGkxYm91aHljd1F2RkN2Z1c4WjBGbVBaRmkwcGNETzhLbkVLWUxrcmxC?oc=5",
+          "published": "Wed, 06 May 2026 22:50:01 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "A股目标涨幅7%和10%_新浪新闻 - 新浪网",
+          "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBsTmFoR2dSQi1TZF83aHZlUmlqdllwd0Y5bXFiN2tNWXFLa3VBWkdfWnNqSXdEQkNKbDdpVUNWd0VBQjhhcmR6U0FvUjZMNUxRTUE2SVZPZG1rSkFUUFZxTUVOOA?oc=5",
+          "published": "Wed, 06 May 2026 22:49:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "沪深两市成交额突破2.5万亿元 - Jiemian.com",
+          "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE90cTRpTWlISlpvR2dnQVNDd1ZLMTlnVVZzbjBwd2ltY1d1eGotbDNpdEpjbzdQNktpOTdad2tNRXprUmMzcmRMenJnNS16dlp6MnlfT3lFcWs?oc=5",
+          "published": "Wed, 06 May 2026 05:40:57 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ],
+      "tech_compute": [
+        {
+          "title": "从横琴到全球：一微半导体千万级商业化应用经验助力VAKY大鲨鱼美容仪腾飞 - 中华网",
+          "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE9DTTBZNmlYRi11Ri16c1dBSjN3b0JVVjg1QllEMF9HM3VDMG1vcG9aNWZ0N1FlU1g4MmhJU2tTdHI5QzFjQ01hRDNNODFtVnk0UEU4N1doMHpuOW1TdkE?oc=5",
+          "published": "Thu, 07 May 2026 01:09:37 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "国产算力链大爆发_新浪新闻 - 新浪网",
+          "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBHdEpXWlJ0TWdZMVNQUmZiUC0yNTFpazJON1gtNF9ua0V1alh3cHBaRFJheGswdjU1MkNsOFF6MENkTXA5SEcteC0wR2RuUkxuS3RlV1FnQVpQOU9SZGtYVDB0VQ?oc=5",
+          "published": "Thu, 07 May 2026 00:57:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "成本普涨、盈利分化！半导体行业涨价潮影响见端倪 - 新浪财经",
+          "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE8yMzFCSWwwMGI4R3RKSFNCZVJtbHllSFZrbzJ4VFAwSDlwLUliZDBxazZ2U0FrNHpoQjgtOEk5dkt6VEVFVFZfdTR1YllsZmZzUF9DUDJTZHA4RXozSXV4VGZrLU9McXhjNjVHSlZsNHA0MHdzS1E?oc=5",
+          "published": "Thu, 07 May 2026 00:04:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "一季度利润最高暴涨超7倍 存储巨头集体赚翻了 - 证券时报",
+          "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE9QUFk4OFAtdXU2VHhSNWl2SXpFOEFzalRNaXhMbUVzT2pWTFV4c2psV1g0ZHZyN2R2M2w4XzdmWWNzN2RZZENtRy1QWWlILTdBMmhtM0x3M1RpNWRI?oc=5",
+          "published": "Wed, 06 May 2026 23:51:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ],
+      "other": [
+        {
+          "title": "Anthropic’s C.E.O. Says It Could Grow by 80 Times This Year",
+          "link": "https://www.nytimes.com/2026/05/06/technology/anthropic-ceo-ai-growth.html",
+          "published": "Thu, 07 May 2026 01:09:53 +0000",
+          "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+          "body_excerpt": ""
+        },
+        {
+          "title": "GameStop’s CEO Ryan Cohen Baffles Fans With eBay Bid",
+          "link": "https://www.nytimes.com/2026/05/06/business/ebay-gamestop-deal-ryan-cohen.html",
+          "published": "Wed, 06 May 2026 20:27:54 +0000",
+          "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+          "body_excerpt": ""
+        },
+        {
+          "title": "19.35亿资金抢筹江波龙，2.75亿资金出逃粤桂股份丨龙虎榜 - 21财经",
+          "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQR0VVWm1PQ3BxLW5aZXJtdEVwZ2JqWTZxc3pNNHZXWUxvYTRfWExPQ2pCWk9PTEs3bHBDaTMxaFJ3Nzk2TmtWTTdVcHFWazc5XzlncmZJQTNhbHpWUV9rdzMxaExGWnJLUG9HaDRxa2lzdGVGMEI4WjFHakxDNXZwcGNzNHh4T3ZPclZob0RTbw?oc=5",
+          "published": "Wed, 06 May 2026 10:52:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8C%97%E5%90%91%E8%B5%84%E9%87%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "大唐发电(601991)龙虎榜数据(05-06) - 东方财富",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9BY0RRUmc2NFZEbmFSa21uMVhoRGVhNEQyR0dJaTI3OE0yS1RYazNXd2t6SEFqUmRVY3hiS2FlcnN2UktELXJKTkliVU5ud050NW9yYVQ0M0x0eWxzR1prSnNYLXBOUQ?oc=5",
+          "published": "Wed, 06 May 2026 09:08:41 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=601991&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ]
+    },
+    "total_items": 24
+  },
+  "gather_url_summary": "",
+  "note": "已按主题聚合并做情绪粗评分；历史回测场景可能与决策日不完全对齐。"
+}

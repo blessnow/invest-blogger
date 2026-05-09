@@ -1,0 +1,282 @@
+{
+  "phase": "open_5m",
+  "decision_date": "2026-05-08",
+  "rss_headlines": [
+    {
+      "title": "A股三大指数开盘集体下跌，创业板指跌超1% - 凤凰网财经",
+      "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1IY190a2tnSnJKbWI5Q1FQZUZ5YTBpTzFZMUZPclUxVFdsX2IyTlpvTnRCczRiMS1CUEFQeTVrSWI3WGhWT05LbHRjcEFvbHcy?oc=5",
+      "published": "Fri, 08 May 2026 01:34:03 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "半导体板块盘初调整，金螳螂开盘跌停 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE1yLVdsWC1iN2dZQlQ4MmlSeUNESHpFZkQ0V1paTHI0cDV1X2IwTmRCY3VXeEt2MGtrZlNNYU5POXNNOS1iZkZfaC1Ial9Ld3M?oc=5",
+      "published": "Fri, 08 May 2026 01:29:41 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "Trade Court Rules Trump’s 10% Global Tariff Is Illegal",
+      "link": "https://www.nytimes.com/2026/05/07/business/economy/trump-global-tariff-ruled-illegal.html",
+      "published": "Fri, 08 May 2026 00:26:57 +0000",
+      "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "A股唯一！机器人“扫地僧”觉醒，北向资金重仓杀入 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNa3NqU0U2SWVaR1U4Y1U1SVNncjZ0VTRSRnZVQmlWRTNLb3RQY2c1TlNzX2EycWZqVDlGVGx0R21yUEY4SEdCWEdFSjZrRzE5QzhWME9tX1RxR0hTeWw3MTYtYnBQM3BZRXV3ZWZaU0p2M0lMWGN5R09pRml1ZEp4SDV0U2xGWFZjelRv?oc=5",
+      "published": "Fri, 08 May 2026 00:07:54 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "沪股通再现“买爆”个股 为何外资被“限购”也要买买买？ - 同花顺",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE56R2VjUFRqNFpQdzZ5Q21KYlRrSkNSbzhKMFpsc2lBM2hYYXNyTkg2TUhhdHE3UFNlaUxWc281U2NBN1hSQ2lwYWJNb2RUMDE5aUh5RDA1OEJMYmZDX1E?oc=5",
+      "published": "Thu, 07 May 2026 23:39:49 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "中国科技股行情或刚刚开始！银华基金方建：国产化是半导体的巨大机遇 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxOd2xSSER5ejNSaDBNazAxQnRwd0pUU010NlpETTB4NUlHczN4cl8zWlYzdHdZUDdnY2ROaWNBa0xRcUMtWktjbU8tdG5pRnNYNHN4WGw0c2JJbG82SGRhUjR2RmVNMFRSRm4yc18wY3NFWXd5TTA2YUt2V3o3U0J1NA?oc=5",
+      "published": "Thu, 07 May 2026 23:21:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "这家半导体设备供应商将在港IPO了 - 凤凰网财经",
+      "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5QOUFGSnNHNk1od3FuMGNtZEUzWjlmR3poOTZNZFF0WVpVMkdwSnBJWjBFWDFRdUIzNXV0NmRTY3J1bGpLaFZYX3dQMFhvX3RR?oc=5",
+      "published": "Thu, 07 May 2026 23:15:41 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "虚构政策、蹭炒热点、误导舆论 多部门联动整治网络谣言乱象 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQREVCME9YeGpuTDZzVV9oRk8zbHg4REFOQ0hoWlB2S2ZyMTVQam54LVV6OVBQcTZmNHNsei1jSlc2XzN0Q1ZxVkQzQ0kxc2xMd3lnN05oMFhRcnZDdzBJdEdpV2NPTXhDek9zMUtnVkdKOXVPREhzZE1tdG9YaWpKU3RycDBrMVBkWC1QeGl5aFhkLW95MmxDNA?oc=5",
+      "published": "Thu, 07 May 2026 22:49:53 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%94%BF%E7%AD%96&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "“云圈”涨价 算力竞争转向拼效能 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5rSmJPN2l5ZEhhcElGaHVYRENFRXpKRmpSSko4bWh3d1A5VjVRVlZTZE0yUzN2aUU3MG9YeVZvSE5RUE9VV1Q2ajU0al82WTIxd0xOVWFkNVdjSDVROWd4ZUU3Rzcwdmh4TFFWUUJn?oc=5",
+      "published": "Thu, 07 May 2026 19:59:26 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "5月7日北向资金最新动向（附十大成交股） - 东方财富",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBaeEtvOENBdE04TEpmTUJQbm9wd2M0SlNXMGh0QU1Pei1CUHpLQ0REQUlWRlUzcng0VktJcUhuamlEWTQxTzZtdE5EaUVzMTJIZnZhY0ptNXJXbC1EUWdjQw?oc=5",
+      "published": "Thu, 07 May 2026 18:53:07 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%8C%97%E5%90%91%E8%B5%84%E9%87%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "Elon Musk’s SpaceX Plans $55 Billion Investment to Make A.I. Chips",
+      "link": "https://www.nytimes.com/2026/05/07/business/spacex-chips-terafab.html",
+      "published": "Thu, 07 May 2026 18:01:59 +0000",
+      "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "U.S. Debt Hits a Concerning Milestone, and Experts Say Trump’s Policies Could Worsen It",
+      "link": "https://www.nytimes.com/2026/05/07/business/us-debt-trump-policies-budget.html",
+      "published": "Thu, 07 May 2026 17:31:02 +0000",
+      "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "AI的背后是算力，算力的背后是电力 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBENjcySGlqYWhGazEydDZZXzh1OGUwUVhUWXl0T3V3Nl9yTHhRTTVyZ1lrRWtrTnZVek5hRjNUZEpNOTFXM1NBaDh4QkRyZmZlbmxPREFfMkpTZHRnRHVmRldhcmpkZ2VVQ1dXNElHY0lRLWU5Nnc?oc=5",
+      "published": "Thu, 07 May 2026 16:00:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "看图学金融 | 上证指数、沪深300、主板、创业板......这些都是啥？ - 搜狐网",
+      "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPOWpyWEJTWkZ0Ylcxd0xXV3dNNVhTcmJqVlY4eFB0SUtRX1VBYldNaFJQay1Bbm9PdjVtMUs2TzN5TUYxWDltbUIyaXBDelFpNTRfX3lIWGM4RzBnYUtnaFhvaW5FMFp5VUpvdkVGbUh0ZDBBaHFlTVBnckg2OVFTcDdHQXdvN3ZEanpoUQ?oc=5",
+      "published": "Thu, 07 May 2026 12:00:45 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "存储芯片迎“超级周期”：全球龙头股价创新高，国内企业注册量激增 - 同花顺",
+      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE02LTFoV3FCUkNEaC1qODBUZ2UzZ1lEWS0xZWVGU2hfUUJfeHNJTl9Ham1TNXg3Z1dJS3pMU3pOajVna3FHME5YeHg0aXZJTjJuMi13aTVwNzl4UnNzWUE?oc=5",
+      "published": "Thu, 07 May 2026 09:03:24 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "A股午后震荡走高涨幅扩大，算力硬件产业链延续强势 - thepaper.cn",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9yUE1UMlk4UDM1RWtsQmR3aXYxRjdFdWJMZ2dJbHdpbm9EWk90U3B2S1BzOE4xMkZPY2pzVTNENUtXU1RMZ3NUVG9uUE45V3ZfM2l5QUZiMU4xQTQzN2V5Uw?oc=5",
+      "published": "Thu, 07 May 2026 07:10:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "沪深两市成交额连续第2个交易日突破3万亿 - Jiemian.com",
+      "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE5ZbXRyeF9WbDJhTmVFTGowcmtuUjVGT21GaUVMcExUclJraElmUGl1REpaaHZRcmRFeVpUcjU4VFRLM2JDRTJVcHJyV3hlRkZoYkZybjE4OUU?oc=5",
+      "published": "Thu, 07 May 2026 06:57:24 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "002491，“一字”涨停 - 东方财富",
+      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE5BTUNrUGNWZW5xd2lwNVdOdm5hUFE3V05RSHl4Wk11MHVUUTFBNTVMUTFheWVZMGVMN1F5RWNzUldsc0RGMVk4cHlpZEprLWs1d202Sjd4anJOT3VkcERBa0h1b2Jndw?oc=5",
+      "published": "Thu, 07 May 2026 05:32:52 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=002491&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "沪深300成长ETF华夏（159523）跌0.52%，半日成交额641.84万元 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPSWIxNnFTOFZPV3hwYlFCN2VlZFF0R0NGQk1EbWxDRW10VzM0UHJsbVdZRlB5eGxHU3NyazkyeGZoanpwcHFoOFNCT2pwNGVRb3l2czhmNjJOc2xsV3V0NEdQblUxWUI4V1JLdmxJRG9JZjNXZGhHQWdjM2ZDbHZud3pzdzl3QWxIWHRkaU1keEpROTZCbTF2Uw?oc=5",
+      "published": "Thu, 07 May 2026 03:34:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "涨价预期持续升温，全球存储芯片龙头齐创新高 - 新浪财经",
+      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE9CWXpnYS1BaldPQTlnN3hBZEFmQkY5X1d1N0d3OVFHd25ZdjRzb3lob0pBMHdqdkttb1ZJMExzS2x0ZExzQ3ZXZGxpTQ?oc=5",
+      "published": "Wed, 06 May 2026 23:23:51 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "A股早盘存储芯片板块大涨，科创50指数涨超9% - thepaper.cn",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5zX3MycFZYaGFOQXBjcXRRY3ZHSmtzY09YLUVDNWh3cTQxNUJpWWdWMmt4dF9qcWhZSGFlVS1makRUcFlLcF9YTVJid0YtSHRpUlQ0eWpkQ1NlRnZPby1SYw?oc=5",
+      "published": "Wed, 06 May 2026 02:07:00 GMT",
+      "source_feed": "https://news.google.com/rss/search?q=%E5%AD%98%E5%82%A8%E8%8A%AF%E7%89%87&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+      "body_excerpt": ""
+    },
+    {
+      "title": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
+      "link": "https://www.wsj.com/articles/nikkei-may-rise-as-weak-yen-raises-earnings-hopes-776a8056?mod=rss_markets_main",
+      "published": "Mon, 27 Jan 2025 14:26:00 -0500",
+      "source_feed": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "Comex Gold, Silver Settle Lower",
+      "link": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
+      "published": "Mon, 27 Jan 2025 14:01:00 -0500",
+      "source_feed": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "body_excerpt": ""
+    },
+    {
+      "title": "DeepSeek Won't Sink U.S. AI Titans",
+      "link": "https://www.wsj.com/articles/deepseek-us-ai-stocks-nvidia-broadcom-6cdfae81?mod=rss_markets_main",
+      "published": "Mon, 27 Jan 2025 13:12:00 -0500",
+      "source_feed": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "body_excerpt": ""
+    }
+  ],
+  "news_digest": {
+    "sentiment": "neutral",
+    "sentiment_score": 2,
+    "topic_headlines": {
+      "macro_policy": [
+        {
+          "title": "虚构政策、蹭炒热点、误导舆论 多部门联动整治网络谣言乱象 - 新浪财经",
+          "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQREVCME9YeGpuTDZzVV9oRk8zbHg4REFOQ0hoWlB2S2ZyMTVQam54LVV6OVBQcTZmNHNsei1jSlc2XzN0Q1ZxVkQzQ0kxc2xMd3lnN05oMFhRcnZDdzBJdEdpV2NPTXhDek9zMUtnVkdKOXVPREhzZE1tdG9YaWpKU3RycDBrMVBkWC1QeGl5aFhkLW95MmxDNA?oc=5",
+          "published": "Thu, 07 May 2026 22:49:53 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E6%94%BF%E7%AD%96&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ],
+      "market_flow": [
+        {
+          "title": "A股三大指数开盘集体下跌，创业板指跌超1% - 凤凰网财经",
+          "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1IY190a2tnSnJKbWI5Q1FQZUZ5YTBpTzFZMUZPclUxVFdsX2IyTlpvTnRCczRiMS1CUEFQeTVrSWI3WGhWT05LbHRjcEFvbHcy?oc=5",
+          "published": "Fri, 08 May 2026 01:34:03 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "A股唯一！机器人“扫地僧”觉醒，北向资金重仓杀入 - 新浪财经",
+          "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNa3NqU0U2SWVaR1U4Y1U1SVNncjZ0VTRSRnZVQmlWRTNLb3RQY2c1TlNzX2EycWZqVDlGVGx0R21yUEY4SEdCWEdFSjZrRzE5QzhWME9tX1RxR0hTeWw3MTYtYnBQM3BZRXV3ZWZaU0p2M0lMWGN5R09pRml1ZEp4SDV0U2xGWFZjelRv?oc=5",
+          "published": "Fri, 08 May 2026 00:07:54 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "5月7日北向资金最新动向（附十大成交股） - 东方财富",
+          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBaeEtvOENBdE04TEpmTUJQbm9wd2M0SlNXMGh0QU1Pei1CUHpLQ0REQUlWRlUzcng0VktJcUhuamlEWTQxTzZtdE5EaUVzMTJIZnZhY0ptNXJXbC1EUWdjQw?oc=5",
+          "published": "Thu, 07 May 2026 18:53:07 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8C%97%E5%90%91%E8%B5%84%E9%87%91&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "看图学金融 | 上证指数、沪深300、主板、创业板......这些都是啥？ - 搜狐网",
+          "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPOWpyWEJTWkZ0Ylcxd0xXV3dNNVhTcmJqVlY4eFB0SUtRX1VBYldNaFJQay1Bbm9PdjVtMUs2TzN5TUYxWDltbUIyaXBDelFpNTRfX3lIWGM4RzBnYUtnaFhvaW5FMFp5VUpvdkVGbUh0ZDBBaHFlTVBnckg2OVFTcDdHQXdvN3ZEanpoUQ?oc=5",
+          "published": "Thu, 07 May 2026 12:00:45 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E6%B2%AA%E6%B7%B1&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ],
+      "tech_compute": [
+        {
+          "title": "半导体板块盘初调整，金螳螂开盘跌停 - 新浪财经",
+          "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE1yLVdsWC1iN2dZQlQ4MmlSeUNESHpFZkQ0V1paTHI0cDV1X2IwTmRCY3VXeEt2MGtrZlNNYU5POXNNOS1iZkZfaC1Ial9Ld3M?oc=5",
+          "published": "Fri, 08 May 2026 01:29:41 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "中国科技股行情或刚刚开始！银华基金方建：国产化是半导体的巨大机遇 - 新浪财经",
+          "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxOd2xSSER5ejNSaDBNazAxQnRwd0pUU010NlpETTB4NUlHczN4cl8zWlYzdHdZUDdnY2ROaWNBa0xRcUMtWktjbU8tdG5pRnNYNHN4WGw0c2JJbG82SGRhUjR2RmVNMFRSRm4yc18wY3NFWXd5TTA2YUt2V3o3U0J1NA?oc=5",
+          "published": "Thu, 07 May 2026 23:21:00 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "这家半导体设备供应商将在港IPO了 - 凤凰网财经",
+          "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5QOUFGSnNHNk1od3FuMGNtZEUzWjlmR3poOTZNZFF0WVpVMkdwSnBJWjBFWDFRdUIzNXV0NmRTY3J1bGpLaFZYX3dQMFhvX3RR?oc=5",
+          "published": "Thu, 07 May 2026 23:15:41 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E5%8D%8A%E5%AF%BC%E4%BD%93&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "“云圈”涨价 算力竞争转向拼效能 - 新浪财经",
+          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5rSmJPN2l5ZEhhcElGaHVYRENFRXpKRmpSSko4bWh3d1A5VjVRVlZTZE0yUzN2aUU3MG9YeVZvSE5RUE9VV1Q2ajU0al82WTIxd0xOVWFkNVdjSDVROWd4ZUU3Rzcwdmh4TFFWUUJn?oc=5",
+          "published": "Thu, 07 May 2026 19:59:26 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=%E7%AE%97%E5%8A%9B&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        }
+      ],
+      "other": [
+        {
+          "title": "Trade Court Rules Trump’s 10% Global Tariff Is Illegal",
+          "link": "https://www.nytimes.com/2026/05/07/business/economy/trump-global-tariff-ruled-illegal.html",
+          "published": "Fri, 08 May 2026 00:26:57 +0000",
+          "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+          "body_excerpt": ""
+        },
+        {
+          "title": "沪股通再现“买爆”个股 为何外资被“限购”也要买买买？ - 同花顺",
+          "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE56R2VjUFRqNFpQdzZ5Q21KYlRrSkNSbzhKMFpsc2lBM2hYYXNyTkg2TUhhdHE3UFNlaUxWc281U2NBN1hSQ2lwYWJNb2RUMDE5aUh5RDA1OEJMYmZDX1E?oc=5",
+          "published": "Thu, 07 May 2026 23:39:49 GMT",
+          "source_feed": "https://news.google.com/rss/search?q=A股&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+          "body_excerpt": ""
+        },
+        {
+          "title": "Elon Musk’s SpaceX Plans $55 Billion Investment to Make A.I. Chips",
+          "link": "https://www.nytimes.com/2026/05/07/business/spacex-chips-terafab.html",
+          "published": "Thu, 07 May 2026 18:01:59 +0000",
+          "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+          "body_excerpt": ""
+        },
+        {
+          "title": "U.S. Debt Hits a Concerning Milestone, and Experts Say Trump’s Policies Could Worsen It",
+          "link": "https://www.nytimes.com/2026/05/07/business/us-debt-trump-policies-budget.html",
+          "published": "Thu, 07 May 2026 17:31:02 +0000",
+          "source_feed": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+          "body_excerpt": ""
+        }
+      ]
+    },
+    "total_items": 24
+  },
+  "gather_url_summary": "",
+  "note": "已按主题聚合并做情绪粗评分；历史回测场景可能与决策日不完全对齐。"
+}
