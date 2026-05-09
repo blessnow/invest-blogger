@@ -14,11 +14,13 @@ dependencies = [
   "pandas>=2.0",
   "matplotlib>=3.8",
   "streamlit>=1.35",
+  "apscheduler>=3.10",
 ]
 
 [project.scripts]
 invest-sim = "invest_system.cli:main"
 invest-live-phase = "invest_system.live_phase:main"
+invest-scheduler = "invest_system.scheduler:main"
 
 [build-system]
 requires = ["setuptools>=61", "wheel"]

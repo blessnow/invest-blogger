@@ -6,6 +6,10 @@ from datetime import datetime
 import pandas as pd
 import streamlit as st
 
+from invest_system.auth import require_login
+from invest_system.bootstrap import ensure_data_seeded
+from invest_system.config import load_settings
+
 
 def _workspace_root() -> Path:
     return Path(__file__).resolve().parent.parent.parent
@@ -159,10 +163,23 @@ def main() -> None:
         layout="wide",
         initial_sidebar_state="expanded"
     )
-    
-    root = _workspace_root()
-    data_dir = root / "data"
-    article_root = root / "artifacts" / "assistant"
+
+    settings = load_settings()
+    require_login(settings)
+
+    if settings.seed_data_enabled:
+        ensure_data_seeded(Path(settings.data_dir), Path(settings.seed_data_dir))
+        ensure_data_seeded(
+            Path(settings.assistant_artifacts_dir),
+            Path(settings.seed_data_dir) / "articles",
+        )
+
+    data_dir = Path(settings.data_dir)
+    article_root = Path(settings.assistant_artifacts_dir)
+    if not article_root.is_dir():
+        legacy = data_dir / "articles"
+        if legacy.is_dir():
+            article_root = legacy
 
     st.sidebar.title("📋 控制面板")
     
@@ -290,20 +307,73 @@ def main() -> None:
                 display_tx["价格"] = display_tx["price"]
             if "fee" in display_tx.columns:
                 display_tx["手续费"] = display_tx["fee"]
+            if "avg_cost_before" in display_tx.columns:
+                display_tx["成本均价"] = pd.to_numeric(display_tx["avg_cost_before"], errors="coerce")
+            if "realized_pnl" in display_tx.columns:
+                display_tx["已实现盈亏"] = pd.to_numeric(display_tx["realized_pnl"], errors="coerce")
+            if "realized_pnl_pct" in display_tx.columns:
+                display_tx["盈亏率(%)"] = pd.to_numeric(display_tx["realized_pnl_pct"], errors="coerce")
             if "cash_after" in display_tx.columns:
                 display_tx["交易后现金"] = display_tx["cash_after"]
-            
-            cols_to_show = [col for col in ["日期", "股票代码", "股票名称", "交易类型", "股数", "价格", "手续费", "交易后现金"] if col in display_tx.columns]
-            
+
+            cols_to_show = [
+                col
+                for col in [
+                    "日期",
+                    "股票代码",
+                    "股票名称",
+                    "交易类型",
+                    "股数",
+                    "价格",
+                    "成本均价",
+                    "已实现盈亏",
+                    "盈亏率(%)",
+                    "手续费",
+                    "交易后现金",
+                ]
+                if col in display_tx.columns
+            ]
+
             if "日期" in display_tx.columns:
                 display_tx = display_tx.sort_values("日期", ascending=False)
-            
-            st.dataframe(display_tx[cols_to_show], width="stretch")
-            
+
+            col_cfg = {}
+            if "价格" in cols_to_show:
+                col_cfg["价格"] = st.column_config.NumberColumn("价格", format="%.4f")
+            if "成本均价" in cols_to_show:
+                col_cfg["成本均价"] = st.column_config.NumberColumn("成本均价", format="%.4f")
+            if "已实现盈亏" in cols_to_show:
+                col_cfg["已实现盈亏"] = st.column_config.NumberColumn("已实现盈亏", format="%.2f")
+            if "盈亏率(%)" in cols_to_show:
+                col_cfg["盈亏率(%)"] = st.column_config.NumberColumn("盈亏率(%)", format="%.2f%%")
+            if "手续费" in cols_to_show:
+                col_cfg["手续费"] = st.column_config.NumberColumn("手续费", format="%.2f")
+            if "交易后现金" in cols_to_show:
+                col_cfg["交易后现金"] = st.column_config.NumberColumn("交易后现金", format="%.2f")
+
+            st.dataframe(display_tx[cols_to_show], width="stretch", column_config=col_cfg)
+
             buy_count = len(tx_df[tx_df["side"] == "buy"]) if "side" in tx_df.columns else 0
             sell_count = len(tx_df[tx_df["side"] == "sell"]) if "side" in tx_df.columns else 0
             total_fee = tx_df["fee"].sum() if "fee" in tx_df.columns else 0
-            st.markdown(f"**买入**: {buy_count} 笔 | **卖出**: {sell_count} 笔 | **总手续费**: {total_fee:.2f}")
+            realized_total = 0.0
+            wins = 0
+            losses = 0
+            if "realized_pnl" in tx_df.columns:
+                rs = pd.to_numeric(tx_df["realized_pnl"], errors="coerce").dropna()
+                realized_total = float(rs.sum())
+                wins = int((rs > 0).sum())
+                losses = int((rs < 0).sum())
+            win_rate = (wins / (wins + losses) * 100) if (wins + losses) > 0 else 0.0
+
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("已实现盈亏合计", f"{realized_total:,.2f}")
+            m2.metric("盈利单数", f"{wins}")
+            m3.metric("亏损单数", f"{losses}")
+            m4.metric("胜率", f"{win_rate:.1f}%")
+            st.markdown(
+                f"**买入**: {buy_count} 笔 | **卖出**: {sell_count} 笔 | **总手续费**: {total_fee:.2f}"
+            )
 
     with tab4:
         st.subheader("每日收益汇总")

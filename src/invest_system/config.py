@@ -108,7 +108,7 @@ class Settings(BaseSettings):
 
     intraday_assistant: str = Field(default="false", validation_alias="INTRADAY_ASSISTANT")
     assistant_artifacts_dir: Path = Field(
-        default=Path("./artifacts/assistant"),
+        default=Path("./data/articles"),
         validation_alias="ASSISTANT_ARTIFACTS_DIR",
     )
     assistant_rss_urls: str = Field(default="", validation_alias="ASSISTANT_RSS_URLS")
@@ -177,6 +177,27 @@ class Settings(BaseSettings):
         default="live_intraday",
         validation_alias="LIVE_EQUITY_CSV_PREFIX",
     )
+
+    #: 行情缓存清理（防止 ohlcv_*.pkl / prices_*.pkl 越积越多）
+    cache_prune_enabled: bool = Field(default=True, validation_alias="CACHE_PRUNE_ENABLED")
+    cache_prune_max_age_days: int = Field(
+        default=14,
+        validation_alias="CACHE_PRUNE_MAX_AGE_DAYS",
+    )
+
+    #: 看板登录（部署到 Railway 等公网时启用）
+    dashboard_auth_enabled: bool = Field(
+        default=False,
+        validation_alias="DASHBOARD_AUTH_ENABLED",
+    )
+    dashboard_users: str = Field(default="", validation_alias="DASHBOARD_USERS")
+
+    #: 首次启动若 DATA_DIR 为空，从此目录播种
+    seed_data_dir: Path = Field(
+        default=Path("./seed_data"),
+        validation_alias="SEED_DATA_DIR",
+    )
+    seed_data_enabled: bool = Field(default=True, validation_alias="SEED_DATA_ENABLED")
 
     def symbols(self) -> list[str]:
         return [s.strip().upper() for s in self.universe.split(",") if s.strip()]

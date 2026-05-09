@@ -82,6 +82,20 @@ def main() -> None:
     print(f"图表: {png_path}")
     print(f"成交CSV: {tx_path}")
 
+    if settings.cache_prune_enabled:
+        from invest_system.cache_janitor import prune_data_cache
+
+        try:
+            stats = prune_data_cache(
+                Path(settings.data_dir),
+                max_age_days=int(settings.cache_prune_max_age_days),
+            )
+            if stats.get("removed"):
+                mb = stats["bytes_freed"] / (1024 * 1024)
+                print(f"缓存清理：删除 {stats['removed']} 个 pkl，释放 {mb:.2f} MB")
+        except Exception as exc:
+            print(f"缓存清理异常：{type(exc).__name__}: {exc}", file=sys.stderr)
+
     root = Path(settings.assistant_artifacts_dir).resolve()
     if assistant_dirs:
         print(f"看盘助手: 已生成 {len(assistant_dirs)} 个交易日，根目录 {root}")

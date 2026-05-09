@@ -64,10 +64,13 @@ def fix_article(article_path: Path, gather_path: Path):
 
 
 def main():
-    artifacts_dir = Path("artifacts/assistant")
-    
+    artifacts_dir = Path("data/articles")
     if not artifacts_dir.exists():
-        print("未找到 artifacts/assistant 目录")
+        legacy = Path("artifacts/assistant")
+        if legacy.exists():
+            artifacts_dir = legacy
+    if not artifacts_dir.exists():
+        print("未找到 data/articles 或 artifacts/assistant 目录")
         return
     
     fixed_count = 0

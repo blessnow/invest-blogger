@@ -26,10 +26,16 @@ invest-sim --prefix my_run    # Custom output prefix
 # or: python3 -m streamlit run src/invest_system/dashboard.py
 ```
 
-**Live intraday phase (macOS LaunchAgent):**
+**Built-in scheduler (推荐，跨平台，可直接部署到 Railway):**
 ```bash
-./scripts/install-macos-agents.sh   # Install 4 daily phases + dashboard
-./scripts/uninstall-macos-agents.sh # Remove agents
+python3 -m invest_system.scheduler         # 常驻进程：4 节点 + 16:30 缓存清理
+# 或：invest-scheduler （setup.py 控制台脚本）
+```
+
+Procfile (Railway / Heroku 类平台):
+```text
+web:    python -m streamlit run src/invest_system/dashboard.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+worker: python -m invest_system.scheduler
 ```
 
 Manual single phase:
@@ -67,12 +73,30 @@ Yahoo symbol format: Shanghai `.SS`, Shenzhen `.SZ` (e.g., `600519.SS`).
 ## Output
 
 - `data/` - Cached OHLCV (`.pkl`), equity curves (`*_equity.csv`), transactions (`*_transactions.csv`)
-- `artifacts/assistant/` - Generated market commentary (markdown)
+- `data/articles/` - Generated market commentary (markdown, was `artifacts/assistant/`)
+- `data/docs/` - One-off conversion artifacts (markdown)
+- `seed_data/` - Cold-start seed shipped in image (copied to `DATA_DIR` if it's empty on first boot)
 - `logs/` - LaunchAgent logs
+
+## Deploy to Railway
+
+1. **Volume**：Add a Volume in your service, mount path 例如 `/data`。
+2. **Variables** 至少设置：
+   - `DEEPSEEK_API_KEY=...`
+   - `DATA_DIR=/data`
+   - `ASSISTANT_ARTIFACTS_DIR=/data/articles`
+   - `LIVE_PORTFOLIO_STATE_PATH=/data/live_portfolio_state.json`
+   - `DASHBOARD_AUTH_ENABLED=true`
+   - `DASHBOARD_USERS=admin:your-strong-pass`（可逗号分隔多账户：`u1:p1,u2:p2`）
+3. 第一次启动：`/data` 是空的，程序会自动从镜像里 `seed_data/` 拷贝当前持仓 JSON、equity CSV、文章目录到 Volume；之后所有读写都直接落到 Volume，下次重启不丢数据。
+4. **进程**：`Procfile` 已声明
+   - `web` → Streamlit 看板（含登录闸）
+   - `worker` → `invest_system.scheduler`（4 个盘中节点 + 16:30 缓存清理）
+5. 想跳过种子数据：`SEED_DATA_ENABLED=false`。
 
 ## Notes
 
 - No test suite. Verify by running `invest-sim` with `STRATEGY_MODE=buy_hold`.
-- `data/`, `artifacts/`, `logs/` are gitignored.
+- `data/`, `artifacts/`, `logs/` are gitignored；`seed_data/` 随仓库分发。
 - Market scanner uses akshare for CN A-share real-time rankings (requires network, optional proxy via `MARKET_SCAN_HTTP_PROXY`).
 - DeepSeek API: default endpoint `https://api.deepseek.com/chat/completions` (no `/v1` prefix).

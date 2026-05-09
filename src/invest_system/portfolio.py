@@ -17,6 +17,8 @@ class Transaction:
     price: float
     fee: float
     cash_after: float
+    avg_cost_before: float | None = None
+    realized_pnl: float | None = None
 
 
 @dataclass
@@ -25,6 +27,7 @@ class Portfolio:
     positions: dict[str, float] = field(default_factory=dict)
     transactions: list[Transaction] = field(default_factory=list)
     fee_rate: float = 0.0005
+    avg_cost: dict[str, float] = field(default_factory=dict)
 
     def copy_state(self) -> tuple[float, dict[str, float]]:
         return self.cash, dict(self.positions)
@@ -53,7 +56,13 @@ class Portfolio:
         if total > self.cash + 1e-9:
             return False
         self.cash -= total
-        self.positions[symbol] = self.positions.get(symbol, 0.0) + shares
+        old_qty = self.positions.get(symbol, 0.0)
+        old_avg = self.avg_cost.get(symbol, 0.0) if old_qty > 0 else 0.0
+        new_qty = old_qty + shares
+        # 含手续费的加权平均买入成本（每股）
+        new_avg = (old_qty * old_avg + total) / new_qty if new_qty > 0 else 0.0
+        self.positions[symbol] = new_qty
+        self.avg_cost[symbol] = new_avg
         self.transactions.append(
             Transaction(
                 day=day,
@@ -63,6 +72,8 @@ class Portfolio:
                 price=price,
                 fee=fee,
                 cash_after=self.cash,
+                avg_cost_before=old_avg if old_qty > 0 else None,
+                realized_pnl=None,
             )
         )
         return True
@@ -76,11 +87,16 @@ class Portfolio:
         proceeds = shares * price
         fee = proceeds * self.fee_rate
         self.cash += proceeds - fee
+        avg = self.avg_cost.get(symbol, 0.0)
+        # 已实现盈亏 = 卖出净流入(扣手续费) - 卖出股数 × 平均成本
+        realized = (proceeds - fee) - shares * avg if avg > 0 else None
         new_h = held - shares
         if new_h <= 1e-9:
             self.positions.pop(symbol, None)
+            self.avg_cost.pop(symbol, None)
         else:
             self.positions[symbol] = new_h
+            # 平均成本对未平仓部分保持不变
         self.transactions.append(
             Transaction(
                 day=day,
@@ -90,6 +106,8 @@ class Portfolio:
                 price=price,
                 fee=fee,
                 cash_after=self.cash,
+                avg_cost_before=avg if avg > 0 else None,
+                realized_pnl=realized,
             )
         )
         return True

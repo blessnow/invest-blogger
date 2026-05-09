@@ -1,5 +1,4 @@
 .env
-artifacts/
 data/
 __pycache__/
 *.py[cod]
@@ -7,3 +6,7 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 logs/
+
+# seed_data/ 是镜像内置的“冷启动种子”，需要随仓库分发；不要忽略它。
+# 若你希望排除大文件，请在 seed_data/.gitignore 内单独配置。
+!seed_data/

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # 安装 LaunchAgents：
 #   · A 股四个节点（Asia/Shanghai）：盘前 9:20、开盘+5分 9:35、午间 11:30、收盘后 15:05 → python3 -m invest_system.live_phase
+#   · 每天 16:30 跑一次缓存清理（兜底，防 ohlcv/prices pkl 越积越多）
 #   · 登录后常驻 Streamlit 看板
 # 用法：./scripts/install-macos-agents.sh
 # 卸载：./scripts/uninstall-macos-agents.sh
@@ -64,6 +65,24 @@ for label, phase, hour, minute in jobs:
     with open(outp, "wb") as f:
         plistlib.dump(data, f)
 
+cache_label = "com.invest-system.cache-janitor"
+cache_log = os.path.join(root, "logs", "cache_janitor.log")
+cache_data = {
+    "Label": cache_label,
+    "WorkingDirectory": root,
+    "ProgramArguments": [
+        "/bin/bash",
+        "-lc",
+        f'cd "{root}" && exec python3 -m invest_system.cache_janitor --data-dir "{os.path.join(root, "data")}"',
+    ],
+    "StartCalendarInterval": [{"Hour": 16, "Minute": 30}],
+    "StandardOutPath": cache_log,
+    "StandardErrorPath": cache_log,
+    "EnvironmentVariables": {"PATH": path_env, "TZ": "Asia/Shanghai"},
+}
+with open(os.path.join(agent_dir, f"{cache_label}.plist"), "wb") as f:
+    plistlib.dump(cache_data, f)
+
 dash_label = "com.invest-system.dashboard"
 dash_cmd = (
     f'cd "{root}" && exec python3 -m streamlit run src/invest_system/dashboard.py '
@@ -82,7 +101,7 @@ dash = {
 with open(os.path.join(agent_dir, f"{dash_label}.plist"), "wb") as f:
     plistlib.dump(dash, f)
 
-print("WROTE", len(jobs) + 1, "plists under", agent_dir)
+print("WROTE", len(jobs) + 2, "plists under", agent_dir)
 PY
 
 # 卸载旧 daily-sim + 加载新任务
@@ -94,6 +113,7 @@ for p in \
   "${AGENT_DIR}/com.invest-system.live-open5m.plist" \
   "${AGENT_DIR}/com.invest-system.live-midday.plist" \
   "${AGENT_DIR}/com.invest-system.live-close.plist" \
+  "${AGENT_DIR}/com.invest-system.cache-janitor.plist" \
   "${AGENT_DIR}/com.invest-system.dashboard.plist"; do
   bootout_plist "$p"
 done
@@ -102,12 +122,14 @@ bootstrap "${AGENT_DIR}/com.invest-system.live-preopen.plist"
 bootstrap "${AGENT_DIR}/com.invest-system.live-open5m.plist"
 bootstrap "${AGENT_DIR}/com.invest-system.live-midday.plist"
 bootstrap "${AGENT_DIR}/com.invest-system.live-close.plist"
+bootstrap "${AGENT_DIR}/com.invest-system.cache-janitor.plist"
 bootstrap "${AGENT_DIR}/com.invest-system.dashboard.plist"
 
 echo "已安装并加载（触发时区 TZ=Asia/Shanghai）："
-echo "  · pre_open   周一至周五 09:20"
-echo "  · open_5m    周一至周五 09:35"
-echo "  · midday     周一至周五 11:30"
-echo "  · close      周一至周五 15:05"
-echo "  · dashboard  登录后 → http://127.0.0.1:${STREAMLIT_PORT:-8501}"
-echo "日志：$ROOT/logs/live_*.log 与 dashboard_*.log"
+echo "  · pre_open      周一至周五 09:20"
+echo "  · open_5m       周一至周五 09:35"
+echo "  · midday        周一至周五 11:30"
+echo "  · close         周一至周五 15:05"
+echo "  · cache-janitor 每天 16:30（兜底清理 ohlcv/prices pkl）"
+echo "  · dashboard     登录后 → http://127.0.0.1:${STREAMLIT_PORT:-8501}"
+echo "日志：$ROOT/logs/live_*.log、cache_janitor.log、dashboard_*.log"

@@ -50,10 +50,17 @@ def load_live_portfolio(path: Path, *, initial_capital: float, fee_rate: float) 
     cash = float(blob.get("cash", initial_capital))
     fee = float(blob.get("fee_rate", fee_rate))
     positions = {str(k).upper(): float(v) for k, v in (blob.get("positions") or {}).items()}
+    avg_cost = {
+        str(k).upper(): float(v)
+        for k, v in (blob.get("avg_cost") or {}).items()
+        if str(v).strip()
+    }
     txs: list[Transaction] = []
     for row in blob.get("transactions") or []:
         if not isinstance(row, dict):
             continue
+        ac_before = row.get("avg_cost_before")
+        rp = row.get("realized_pnl")
         txs.append(
             Transaction(
                 day=date.fromisoformat(str(row["day"])),
@@ -63,9 +70,44 @@ def load_live_portfolio(path: Path, *, initial_capital: float, fee_rate: float) 
                 price=float(row["price"]),
                 fee=float(row["fee"]),
                 cash_after=float(row["cash_after"]),
+                avg_cost_before=float(ac_before) if ac_before not in (None, "") else None,
+                realized_pnl=float(rp) if rp not in (None, "") else None,
             )
         )
-    return Portfolio(cash=cash, positions=positions, transactions=txs, fee_rate=fee)
+    if not avg_cost and txs and positions:
+        avg_cost = _replay_avg_cost_from_transactions(txs)
+    return Portfolio(
+        cash=cash,
+        positions=positions,
+        transactions=txs,
+        fee_rate=fee,
+        avg_cost=avg_cost,
+    )
+
+
+def _replay_avg_cost_from_transactions(txs: list[Transaction]) -> dict[str, float]:
+    """从历史成交回放出每个标的的加权平均成本（含手续费）。仅用于旧状态升级。"""
+    qty: dict[str, float] = {}
+    avg: dict[str, float] = {}
+    for t in txs:
+        sym = str(t.symbol).upper()
+        if t.side == "buy":
+            old_q = qty.get(sym, 0.0)
+            old_a = avg.get(sym, 0.0)
+            cost_with_fee = t.shares * t.price + (t.fee or 0.0)
+            new_q = old_q + t.shares
+            if new_q > 0:
+                avg[sym] = (old_q * old_a + cost_with_fee) / new_q
+                qty[sym] = new_q
+        elif t.side == "sell":
+            old_q = qty.get(sym, 0.0)
+            new_q = old_q - t.shares
+            if new_q <= 1e-9:
+                qty.pop(sym, None)
+                avg.pop(sym, None)
+            else:
+                qty[sym] = new_q
+    return avg
 
 
 def save_live_portfolio(path: Path, portfolio: Portfolio) -> None:
@@ -74,6 +116,7 @@ def save_live_portfolio(path: Path, portfolio: Portfolio) -> None:
         "cash": portfolio.cash,
         "fee_rate": portfolio.fee_rate,
         "positions": {k: float(v) for k, v in portfolio.positions.items()},
+        "avg_cost": {k: float(v) for k, v in portfolio.avg_cost.items()},
         "transactions": [
             {
                 "day": t.day.isoformat(),
@@ -83,6 +126,8 @@ def save_live_portfolio(path: Path, portfolio: Portfolio) -> None:
                 "price": t.price,
                 "fee": t.fee,
                 "cash_after": t.cash_after,
+                "avg_cost_before": t.avg_cost_before,
+                "realized_pnl": t.realized_pnl,
             }
             for t in portfolio.transactions
         ],
@@ -430,6 +475,20 @@ def run_live_intraday_phase(settings: Settings, *, phase_key: str) -> None:
         f"现金={portfolio.cash:.2f} 持仓={len(portfolio.positions)} "
         f"状态→{state_path}"
     )
+
+    if settings.cache_prune_enabled:
+        from invest_system.cache_janitor import prune_data_cache
+
+        try:
+            stats = prune_data_cache(
+                Path(settings.data_dir),
+                max_age_days=int(settings.cache_prune_max_age_days),
+            )
+            if stats.get("removed"):
+                mb = stats["bytes_freed"] / (1024 * 1024)
+                print(f"[live] 缓存清理：删除 {stats['removed']} 个 pkl，释放 {mb:.2f} MB")
+        except Exception as exc:
+            print(f"[live] 缓存清理异常：{type(exc).__name__}: {exc}", file=sys.stderr)
 
 
 def main(argv: list[str] | None = None) -> None:

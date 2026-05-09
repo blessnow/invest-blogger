@@ -7,6 +7,7 @@ LABELS=(
   com.invest-system.live-open5m
   com.invest-system.live-midday
   com.invest-system.live-close
+  com.invest-system.cache-janitor
   com.invest-system.dashboard
   com.invest-system.daily-sim
 )
