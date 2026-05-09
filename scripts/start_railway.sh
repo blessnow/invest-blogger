@@ -6,6 +6,10 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+# Railway/Nixpacks 默认只跑 pip install -r requirements.txt，没有把当前 src/ layout 装进 site-packages。
+# 用 PYTHONPATH 直接从源码加载，避免依赖 editable install。
+export PYTHONPATH="${PYTHONPATH:-}:$(pwd)/src"
+
 PORT="${PORT:-8501}"
 
 echo "[start_railway] launching scheduler in background…"
