@@ -178,8 +178,8 @@ def _apply_actions(
             want = int(float(a.get("shares", 0)))
         except (TypeError, ValueError):
             continue
-        held = portfolio.positions.get(sym, 0.0)
-        raw_sell = min(want, int(math.floor(held)))
+        sellable = portfolio.sellable_today(day, sym)
+        raw_sell = min(want, int(math.floor(sellable)))
         shares = _lot_floor(raw_sell, lot_size)
         if shares > 0:
             portfolio.sell(day, sym, float(shares), price, ts=ts)

@@ -185,6 +185,9 @@ class Settings(BaseSettings):
         validation_alias="CACHE_PRUNE_MAX_AGE_DAYS",
     )
 
+    #: A 股 T+1：当日买入当日不可卖。回测/纸面策略想放开就置 false。
+    t_plus_1_enabled: bool = Field(default=True, validation_alias="T_PLUS_1_ENABLED")
+
     #: 看板登录（部署到 Railway 等公网时启用）
     dashboard_auth_enabled: bool = Field(
         default=False,

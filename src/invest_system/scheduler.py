@@ -142,6 +142,7 @@ def main(argv: list[str] | None = None) -> None:
                 state_path,
                 initial_capital=float(settings.initial_capital),
                 fee_rate=float(settings.commission_rate),
+                t_plus_1_enabled=bool(settings.t_plus_1_enabled),
             )
             save_live_portfolio(state_path, p)
             prefix = settings.live_equity_csv_prefix.strip() or "live_intraday"

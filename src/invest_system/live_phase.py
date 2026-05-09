@@ -40,13 +40,27 @@ def _shanghai_now() -> datetime:
     return datetime.now(ZoneInfo("Asia/Shanghai"))
 
 
-def load_live_portfolio(path: Path, *, initial_capital: float, fee_rate: float) -> Portfolio:
+def load_live_portfolio(
+    path: Path,
+    *,
+    initial_capital: float,
+    fee_rate: float,
+    t_plus_1_enabled: bool = True,
+) -> Portfolio:
     if not path.is_file():
-        return Portfolio(cash=float(initial_capital), fee_rate=float(fee_rate))
+        return Portfolio(
+            cash=float(initial_capital),
+            fee_rate=float(fee_rate),
+            t_plus_1_enabled=bool(t_plus_1_enabled),
+        )
     try:
         blob = json.loads(path.read_text(encoding="utf-8"))
     except Exception:
-        return Portfolio(cash=float(initial_capital), fee_rate=float(fee_rate))
+        return Portfolio(
+            cash=float(initial_capital),
+            fee_rate=float(fee_rate),
+            t_plus_1_enabled=bool(t_plus_1_enabled),
+        )
     cash = float(blob.get("cash", initial_capital))
     fee = float(blob.get("fee_rate", fee_rate))
     positions = {str(k).upper(): float(v) for k, v in (blob.get("positions") or {}).items()}
@@ -85,12 +99,26 @@ def load_live_portfolio(path: Path, *, initial_capital: float, fee_rate: float) 
         )
     if not avg_cost and txs and positions:
         avg_cost = _replay_avg_cost_from_transactions(txs)
+
+    last_trade_day_str = blob.get("last_trade_day")
+    last_trade_day = (
+        date.fromisoformat(str(last_trade_day_str))
+        if last_trade_day_str not in (None, "")
+        else None
+    )
+    today_bought = {
+        str(k).upper(): float(v)
+        for k, v in (blob.get("today_bought") or {}).items()
+    }
     return Portfolio(
         cash=cash,
         positions=positions,
         transactions=txs,
         fee_rate=fee,
         avg_cost=avg_cost,
+        last_trade_day=last_trade_day,
+        today_bought=today_bought,
+        t_plus_1_enabled=bool(t_plus_1_enabled),
     )
 
 
@@ -126,6 +154,10 @@ def save_live_portfolio(path: Path, portfolio: Portfolio) -> None:
         "fee_rate": portfolio.fee_rate,
         "positions": {k: float(v) for k, v in portfolio.positions.items()},
         "avg_cost": {k: float(v) for k, v in portfolio.avg_cost.items()},
+        "last_trade_day": (
+            portfolio.last_trade_day.isoformat() if portfolio.last_trade_day else None
+        ),
+        "today_bought": {k: float(v) for k, v in portfolio.today_bought.items()},
         "transactions": [
             {
                 "day": t.day.isoformat(),
@@ -215,6 +247,7 @@ def run_live_intraday_phase(settings: Settings, *, phase_key: str) -> None:
         state_path,
         initial_capital=float(settings.initial_capital),
         fee_rate=float(settings.commission_rate),
+        t_plus_1_enabled=bool(settings.t_plus_1_enabled),
     )
 
     start_d = (decision_day - timedelta(days=420)).isoformat()
