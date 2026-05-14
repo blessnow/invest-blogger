@@ -202,6 +202,38 @@ class Settings(BaseSettings):
     )
     seed_data_enabled: bool = Field(default=True, validation_alias="SEED_DATA_ENABLED")
 
+    broker_mode: str = Field(default="paper", validation_alias="BROKER_MODE")
+    jvquant_token: str = Field(default="", validation_alias="JVQUANT_TOKEN")
+    jvquant_account: str = Field(default="", validation_alias="JVQUANT_ACCOUNT")
+    jvquant_password: str = Field(default="", validation_alias="JVQUANT_PASSWORD")
+
+    # ---- Evolution settings ----
+    evolution_enabled: bool = Field(default=False, validation_alias="EVOLUTION_ENABLED")
+    evolution_schedule_cron: str = Field(
+        default="0 18 * * 5",
+        validation_alias="EVOLUTION_SCHEDULE_CRON",
+    )
+    evolution_data_lookback_days: int = Field(
+        default=60,
+        validation_alias="EVOLUTION_DATA_LOOKBACK_DAYS",
+    )
+    evolution_backtest_start: str = Field(
+        default="2024-01-01",
+        validation_alias="EVOLUTION_BACKTEST_START",
+    )
+    evolution_backtest_end: str = Field(
+        default="2024-12-31",
+        validation_alias="EVOLUTION_BACKTEST_END",
+    )
+    evolution_max_mutations_per_cycle: int = Field(
+        default=3,
+        validation_alias="EVOLUTION_MAX_MUTATIONS_PER_CYCLE",
+    )
+    evolution_genome_dir: Path = Field(
+        default=Path("./data/evolution"),
+        validation_alias="EVOLUTION_GENOME_DIR",
+    )
+
     def symbols(self) -> list[str]:
         return [s.strip().upper() for s in self.universe.split(",") if s.strip()]
 

@@ -21,7 +21,39 @@ from invest_system.llm_strategy import (
     system_prompt_for,
 )
 from invest_system.portfolio import Portfolio
+from invest_system.broker import Broker, OrderResult
 from invest_system.symbols import is_valid_cn_yahoo_symbol
+from invest_system.engine_hooks import get_hook_registry
+
+# ---------------------------------------------------------------------------
+# Runtime-configurable parameters (modified by evolution system)
+# ---------------------------------------------------------------------------
+_RUNTIME_PARAMS: dict[str, float | int] = {
+    "candidate_score_weight_ret1d": 0.65,
+    "candidate_score_weight_ret5d": 0.35,
+    "recent_bars_lookback": 15,
+    "watchlist_cap": 27,
+    "deploy_fraction": 0.95,
+}
+
+_CUSTOM_SCORING_FN: Any | None = None
+
+
+def get_runtime_params() -> dict[str, float | int]:
+    return dict(_RUNTIME_PARAMS)
+
+
+def set_runtime_params(params: dict[str, float | int]) -> None:
+    _RUNTIME_PARAMS.update(params)
+
+
+def get_custom_scoring_fn() -> Any | None:
+    return _CUSTOM_SCORING_FN
+
+
+def set_custom_scoring_fn(fn: Any | None) -> None:
+    global _CUSTOM_SCORING_FN
+    _CUSTOM_SCORING_FN = fn
 
 
 def _lot_floor(shares: int, lot_size: int) -> int:
@@ -40,11 +72,12 @@ class EquitySnapshot:
     positions: dict[str, float]
 
 
-def _fmt_recent_bars(df: pd.DataFrame, symbols: list[str], as_of: pd.Timestamp, lookback: int = 15) -> str:
+def _fmt_recent_bars(df: pd.DataFrame, symbols: list[str], as_of: pd.Timestamp, lookback: int | None = None) -> str:
+    lb = lookback if lookback is not None else int(_RUNTIME_PARAMS["recent_bars_lookback"])
     try:
-        sub = df.loc[:as_of].tail(lookback)
+        sub = df.loc[:as_of].tail(lb)
     except KeyError:
-        sub = df[df.index <= as_of].tail(lookback)
+        sub = df[df.index <= as_of].tail(lb)
     if isinstance(sub.columns, pd.MultiIndex):
         sub = sub.sort_index(axis=1)
     lines: list[str] = []
@@ -98,7 +131,39 @@ def _build_candidate_pool(
             vol = sub[(sym, "Volume")].dropna() if (sym, "Volume") in sub.columns else pd.Series(dtype=float)
             last_vol = float(vol.iloc[-1]) if not vol.empty else 0.0
             notional = max(0.0, last * last_vol)
-            score = 0.65 * ret1 + 0.35 * ret5
+            # Compute enriched features for hooks
+            ret10 = ret5
+            if len(closes) >= 11 and float(closes.iloc[-11]) > 0:
+                ret10 = (last / float(closes.iloc[-11]) - 1.0) * 100.0
+            ret20 = ret10
+            if len(closes) >= 21 and float(closes.iloc[-21]) > 0:
+                ret20 = (last / float(closes.iloc[-21]) - 1.0) * 100.0
+            vol_series = sub[(sym, "Volume")].dropna() if (sym, "Volume") in sub.columns else pd.Series(dtype=float)
+            avg_vol_5d = float(vol_series.tail(5).mean()) if len(vol_series) >= 1 else 0.0
+            recent_closes = closes.tail(10)
+            volatility_10d = float(recent_closes.pct_change().dropna().std()) if len(recent_closes) >= 3 else 0.0
+            high_10d = float(closes.tail(10).max()) if len(closes) >= 1 else last
+            low_10d = float(closes.tail(10).min()) if len(closes) >= 1 else last
+
+            hook_ctx = {
+                "symbol": sym, "ret1d_pct": ret1, "ret5d_pct": ret5,
+                "ret10d_pct": ret10, "ret20d_pct": ret20,
+                "last_close": last, "avg_volume_5d": avg_vol_5d,
+                "notional": notional, "volatility_10d": volatility_10d,
+                "high_10d": high_10d, "low_10d": low_10d,
+            }
+            hooks = get_hook_registry()
+            if hooks._hooks.get("score_candidate") is not None:
+                score = hooks.score_candidate(hook_ctx)
+            elif _CUSTOM_SCORING_FN is not None:
+                try:
+                    score = float(_CUSTOM_SCORING_FN({"ret1d": ret1, "ret5d": ret5, "last_close": last, "notional": notional}))
+                except Exception:
+                    score = 0.0
+            else:
+                w1 = float(_RUNTIME_PARAMS["candidate_score_weight_ret1d"])
+                w5 = float(_RUNTIME_PARAMS["candidate_score_weight_ret5d"])
+                score = w1 * ret1 + w5 * ret5
             rows.append(
                 {
                     "symbol": sym,
@@ -156,9 +221,9 @@ def _apply_actions(
     day: date,
     max_fraction: float,
     lot_size: int,
-    *,
     free_selection: bool,
     ts: datetime | None = None,
+    broker: Broker | None = None,
 ) -> None:
     sells = [a for a in actions if str(a.get("side", "")).lower() == "sell"]
     buys = [a for a in actions if str(a.get("side", "")).lower() == "buy"]
@@ -182,7 +247,12 @@ def _apply_actions(
         raw_sell = min(want, int(math.floor(sellable)))
         shares = _lot_floor(raw_sell, lot_size)
         if shares > 0:
-            portfolio.sell(day, sym, float(shares), price, ts=ts)
+            if broker:
+                result = broker.execute("sell", sym, float(shares), price, day=day, ts=ts)
+                if result.success:
+                    portfolio.sell(day, sym, float(shares), price, ts=ts)
+            else:
+                portfolio.sell(day, sym, float(shares), price, ts=ts)
 
     for a in buys:
         sym = str(a.get("symbol", "")).upper().strip()
@@ -199,9 +269,35 @@ def _apply_actions(
             want = int(float(a.get("shares", 0)))
         except (TypeError, ValueError):
             continue
+        # Hook: size_position
+        hooks = get_hook_registry()
+        if hooks._hooks.get("size_position") is not None:
+            size_ctx = {
+                "symbol": sym, "side": "buy", "requested_shares": want,
+                "price": price,
+                "portfolio": {
+                    "cash": portfolio.cash, "equity": portfolio.equity(prices),
+                    "positions": dict(portfolio.positions),
+                    "num_positions": len(portfolio.positions),
+                },
+                "current_shares": portfolio.positions.get(sym, 0),
+                "current_market_value": portfolio.market_value(sym, prices),
+                "position_fraction": portfolio.market_value(sym, prices) / max(portfolio.equity(prices), 1),
+                "max_fraction": max_fraction,
+                "avg_cost": portfolio.avg_cost.get(sym),
+                "unrealized_pnl_pct": (price / portfolio.avg_cost[sym] - 1) * 100 if sym in portfolio.avg_cost and portfolio.avg_cost[sym] > 0 else None,
+                "recent_bars": [],
+                "max_fraction_config": max_fraction,
+            }
+            want = hooks.size_position(size_ctx)
         capped = _cap_buy_shares(portfolio, sym, want, price, max_fraction, prices, lot_size)
         if capped > 0:
-            portfolio.buy(day, sym, float(capped), price, ts=ts)
+            if broker:
+                result = broker.execute("buy", sym, float(capped), price, day=day, ts=ts)
+                if result.success:
+                    portfolio.buy(day, sym, float(capped), price, ts=ts)
+            else:
+                portfolio.buy(day, sym, float(capped), price, ts=ts)
 
 
 def _initial_buy_hold(
@@ -210,11 +306,12 @@ def _initial_buy_hold(
     universe: list[str],
     day: date,
     lot_size: int,
-    deploy_fraction: float = 0.95,
+    deploy_fraction: float | None = None,
 ) -> None:
     if not prices:
         return
-    budget = portfolio.cash * deploy_fraction
+    frac = deploy_fraction if deploy_fraction is not None else float(_RUNTIME_PARAMS["deploy_fraction"])
+    budget = portfolio.cash * frac
     per = budget / max(len(universe), 1)
     for sym in universe:
         p = prices.get(sym)
@@ -230,6 +327,7 @@ def _initial_buy_hold(
 def run_simulation(
     settings: Settings,
     price_df: pd.DataFrame,
+    broker: Broker | None = None,
 ) -> tuple[Portfolio, list[EquitySnapshot], list[Path]]:
     free = settings.is_free_selection()
     fixed_syms = settings.symbols()
@@ -252,6 +350,10 @@ def run_simulation(
 
     rebalance_every = max(1, settings.rebalance_every_days)
     first_allocation_done = False
+    days_since_last_rebalance = rebalance_every  # force first rebalance
+    recent_equity_returns: list[float] = []
+    peak_equity = float(settings.initial_capital)
+    hooks = get_hook_registry()
 
     for i, ts in enumerate(dates):
         d = ts.date() if hasattr(ts, "date") else pd.Timestamp(ts).date()
@@ -284,15 +386,93 @@ def run_simulation(
                     lot_size=int(settings.lot_size),
                 )
                 first_allocation_done = True
-        elif i % rebalance_every == 0 and prices:
-            if settings.strategy_mode.strip().lower() == "llm":
+        elif prices:
+            # Compute loop state for hooks
+            eq_pre = portfolio.equity(prices)
+            current_drawdown = (eq_pre / peak_equity - 1) * 100 if peak_equity > 0 else 0.0
+            market_regime = "neutral"
+            if len(recent_equity_returns) >= 5:
+                avg5 = sum(recent_equity_returns[-5:]) / 5
+                if avg5 > 0.3:
+                    market_regime = "bull"
+                elif avg5 < -0.3:
+                    market_regime = "bear"
+
+            # --- Hook: check_exit (stop-loss / take-profit) ---
+            if portfolio.positions:
+                positions_info: dict[str, dict] = {}
+                for sym_pos, shares_pos in portfolio.positions.items():
+                    px = prices.get(sym_pos)
+                    if px is None or px <= 0 or shares_pos <= 0:
+                        continue
+                    ac = portfolio.avg_cost.get(sym_pos)
+                    pnl_pct = (px / ac - 1) * 100 if ac and ac > 0 else 0.0
+                    sym_bars = []
+                    try:
+                        closes_buf = panel.loc[:ts_pd].tail(15)
+                        sym_c = closes_buf[(sym_pos, "Close")].dropna()
+                        sym_bars = [float(x) for x in sym_c.tail(10)] if len(sym_c) > 0 else []
+                    except Exception:
+                        pass
+                    positions_info[sym_pos] = {
+                        "shares": shares_pos, "avg_cost": ac or 0.0,
+                        "current_price": px, "unrealized_pnl_pct": pnl_pct,
+                        "recent_bars": sym_bars,
+                    }
+                exit_ctx = {
+                    "day": str(d), "positions": positions_info,
+                    "portfolio": {"cash": portfolio.cash, "equity": eq_pre},
+                    "market_regime": market_regime,
+                }
+                forced_exits = hooks.check_exit(exit_ctx)
+                if forced_exits:
+                    exit_actions = []
+                    for ex in forced_exits:
+                        sym_ex = str(ex.get("symbol", "")).upper().strip()
+                        if sym_ex in portfolio.positions:
+                            sellable = portfolio.sellable_today(d, sym_ex)
+                            shares_ex = int(math.floor(sellable))
+                            shares_ex = _lot_floor(shares_ex, int(settings.lot_size))
+                            if shares_ex > 0:
+                                exit_actions.append({
+                                    "symbol": sym_ex, "side": "sell",
+                                    "shares": shares_ex,
+                                    "reason": ex.get("reason", "check_exit"),
+                                })
+                    if exit_actions:
+                        _apply_actions(
+                            portfolio, exit_actions, prices, universe, d,
+                            settings.max_position_fraction, int(settings.lot_size),
+                            free_selection=free, broker=broker,
+                        )
+
+            # --- Hook: should_rebalance ---
+            rebalance_ctx = {
+                "day_index": i, "day": str(d),
+                "days_since_rebalance": days_since_last_rebalance,
+                "portfolio": {
+                    "cash": portfolio.cash,
+                    "equity": portfolio.equity(prices),
+                    "positions": dict(portfolio.positions),
+                    "num_positions": len(portfolio.positions),
+                },
+                "prices": prices,
+                "recent_returns": recent_equity_returns[-10:],
+                "drawdown_pct": current_drawdown,
+                "default_interval": rebalance_every,
+            }
+            should_rebal = hooks.should_rebalance(rebalance_ctx)
+            days_since_last_rebalance += 1
+
+            if should_rebal and settings.strategy_mode.strip().lower() == "llm":
+                days_since_last_rebalance = 0
                 cal = settings.calendar_symbol.strip().upper()
                 bms = settings.reference_benchmark_symbols()
                 others = list(
                     dict.fromkeys([*portfolio.positions.keys(), *fixed_syms, cal])
                 )
                 others = [w for w in others if w and w not in set(bms)]
-                watch_trimmed = bms + others[: max(0, 27 - len(bms))]
+                watch_trimmed = bms + others[: max(0, int(_RUNTIME_PARAMS["watchlist_cap"]) - len(bms))]
                 candidate_symbols: list[str] = []
                 candidate_text = ""
                 auto_quotes: dict[str, float] = {}
@@ -461,6 +641,27 @@ def run_simulation(
                                 action_syms.append(s)
                         panel = ensure_panel_has_symbols(panel, action_syms, start, end, cache_dir)
                         prices = latest_row(panel, ts_pd)
+                        # --- Hook: filter_risk ---
+                        risk_ctx = {
+                            "day": str(d), "actions": executable_actions,
+                            "portfolio": {
+                                "cash": portfolio.cash,
+                                "equity": portfolio.equity(prices),
+                                "positions": dict(portfolio.positions),
+                                "num_positions": len(portfolio.positions),
+                            },
+                            "prices": prices,
+                            "max_position_fraction": float(settings.max_position_fraction),
+                            "position_fractions": {
+                                sym_rf: portfolio.market_value(sym_rf, prices) / max(portfolio.equity(prices), 1)
+                                for sym_rf in portfolio.positions
+                            },
+                            "drawdown_pct": current_drawdown,
+                            "recent_returns": recent_equity_returns[-10:],
+                        }
+                        executable_actions = hooks.filter_risk(risk_ctx)
+                        if not isinstance(executable_actions, list):
+                            executable_actions = []
                         _apply_actions(
                             portfolio,
                             executable_actions,
@@ -470,12 +671,21 @@ def run_simulation(
                             settings.max_position_fraction,
                             int(settings.lot_size),
                             free_selection=free,
+                            broker=broker,
                         )
                 except Exception:
                     # 网络/解析失败则本轮不调仓，避免中断整段回测
                     pass
 
         eq = portfolio.equity(prices)
+        if eq > peak_equity:
+            peak_equity = eq
+        if snapshots:
+            prev_eq = snapshots[-1].equity
+            if prev_eq > 0:
+                recent_equity_returns.append((eq / prev_eq - 1) * 100)
+                if len(recent_equity_returns) > 20:
+                    recent_equity_returns = recent_equity_returns[-20:]
         snapshots.append(
             EquitySnapshot(
                 day=d,

@@ -18,6 +18,27 @@ import httpx
 
 from invest_system.config import Settings
 
+# ---------------------------------------------------------------------------
+# Runtime-configurable overrides (modified by evolution system)
+# ---------------------------------------------------------------------------
+_PROMPT_OVERRIDES: dict[str, str] = {}
+
+_LLM_PARAMS: dict[str, float] = {
+    "llm_temperature": 0.2,
+}
+
+
+def set_prompt_overrides(overrides: dict[str, str]) -> None:
+    _PROMPT_OVERRIDES.update(overrides)
+
+
+def get_llm_params() -> dict[str, float]:
+    return dict(_LLM_PARAMS)
+
+
+def set_llm_params(params: dict[str, float]) -> None:
+    _LLM_PARAMS.update(params)
+
 
 def _apply_deepseek_request_extensions(settings: Settings, payload: dict[str, Any]) -> dict[str, Any]:
     """合并官方文档/extra 中与模型相关的可选字段（thinking、reasoning_effort、stream 等）。"""
@@ -74,7 +95,7 @@ async def deepseek_decision(
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            "temperature": 0.2,
+            "temperature": _LLM_PARAMS["llm_temperature"],
         },
     )
     headers = {
@@ -108,7 +129,7 @@ def deepseek_decision_sync(
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            "temperature": 0.2,
+            "temperature": _LLM_PARAMS["llm_temperature"],
         },
     )
     headers = {
@@ -233,7 +254,9 @@ JSON Schema:
 
 
 def system_prompt_for(selection_mode: str) -> str:
-    return SYSTEM_FREE if selection_mode.strip().lower() == "free" else SYSTEM_FIXED
+    if selection_mode.strip().lower() == "free":
+        return _PROMPT_OVERRIDES.get("system_free", SYSTEM_FREE)
+    return _PROMPT_OVERRIDES.get("system_fixed", SYSTEM_FIXED)
 
 
 def build_user_prompt(

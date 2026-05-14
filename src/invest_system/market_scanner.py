@@ -11,6 +11,22 @@ from typing import Any
 import pandas as pd
 import requests
 
+# ---------------------------------------------------------------------------
+# Runtime-configurable parameters (modified by evolution system)
+# ---------------------------------------------------------------------------
+_SCANNER_PARAMS: dict[str, float] = {
+    "scanner_score_weight_chg": 0.65,
+    "scanner_score_weight_amt": 0.35,
+}
+
+
+def get_scanner_params() -> dict[str, float]:
+    return dict(_SCANNER_PARAMS)
+
+
+def set_scanner_params(params: dict[str, float]) -> None:
+    _SCANNER_PARAMS.update(params)
+
 
 def _to_yahoo_symbol(code: str) -> str:
     c = (code or "").strip()
@@ -152,7 +168,9 @@ def _scan_from_all_spot_legacy(top_n: int) -> tuple[list[str], str, dict[str, fl
     liquid = df.sort_values("amount", ascending=False).head(liq_n).copy()
     liquid["rank_chg"] = liquid["chg_pct"].rank(pct=True)
     liquid["rank_amt"] = liquid["amount"].rank(pct=True)
-    liquid["score"] = liquid["rank_chg"] * 0.65 + liquid["rank_amt"] * 0.35
+    w_chg = _SCANNER_PARAMS["scanner_score_weight_chg"]
+    w_amt = _SCANNER_PARAMS["scanner_score_weight_amt"]
+    liquid["score"] = liquid["rank_chg"] * w_chg + liquid["rank_amt"] * w_amt
     top = liquid.sort_values("score", ascending=False).head(top_n).copy()
 
     symbols = top["symbol"].astype(str).tolist()
@@ -377,7 +395,9 @@ def scan_cn_candidates_with_akshare(
     liquid = df.sort_values("amount", ascending=False).head(liq_n).copy()
     liquid["rank_chg"] = liquid["chg_pct"].rank(pct=True)
     liquid["rank_amt"] = liquid["amount"].rank(pct=True)
-    liquid["score"] = liquid["rank_chg"] * 0.65 + liquid["rank_amt"] * 0.35
+    w_chg = _SCANNER_PARAMS["scanner_score_weight_chg"]
+    w_amt = _SCANNER_PARAMS["scanner_score_weight_amt"]
+    liquid["score"] = liquid["rank_chg"] * w_chg + liquid["rank_amt"] * w_amt
     top = liquid.sort_values("score", ascending=False).head(top_n).copy()
 
     symbols = top["symbol"].astype(str).tolist()

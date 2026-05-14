@@ -12,6 +12,8 @@ pip install -r requirements.txt
 
 Copy `example.env` to `.env` and set `DEEPSEEK_API_KEY` (required for `STRATEGY_MODE=llm`).
 
+**PYTHONPATH**: Railway/Nixpacks only runs `pip install -r requirements.txt`, not an editable install. `scripts/start_railway.sh` sets `PYTHONPATH=src/` to load from source. For local runs without pip install, do the same.
+
 ## Commands
 
 **Run backtest simulation:**
@@ -70,6 +72,31 @@ All config via `.env` (pydantic-settings). Critical vars:
 
 Yahoo symbol format: Shanghai `.SS`, Shenzhen `.SZ` (e.g., `600519.SS`).
 
+## Live Trading (实盘交易)
+
+支持模拟盘和实盘切换，通过 `BROKER_MODE` 配置：
+
+- `paper` (默认) - 模拟盘，仅在内存中更新持仓
+- `jvquant` - jvQuant 实盘（需注册 jvQuant 并开通东方财富账户）
+
+**配置示例 (.env)：**
+```bash
+BROKER_MODE=jvquant
+JVQUANT_TOKEN=your_token        # jvQuant API token
+JVQUANT_ACCOUNT=12位资金账号      # 券商资金账号
+JVQUANT_PASSWORD=交易密码         # 资金交易密码
+```
+
+**jvQuant 说明：**
+- 个人账户仅支持东方财富
+- 机构账户无券商限制
+- 文档：http://jvquant.com/wiki.html
+
+**Broker 架构：**
+- `src/invest_system/broker/__init__.py` - 抽象层 + 工厂函数
+- `src/invest_system/broker/paper.py` - 模拟盘执行器
+- `src/invest_system/broker/jvquant.py` - jvQuant 实盘执行器
+
 ## Output
 
 - `data/` - Cached OHLCV (`.pkl`), equity curves (`*_equity.csv`), transactions (`*_transactions.csv`)
@@ -97,6 +124,7 @@ Yahoo symbol format: Shanghai `.SS`, Shenzhen `.SZ` (e.g., `600519.SS`).
 ## Notes
 
 - No test suite. Verify by running `invest-sim` with `STRATEGY_MODE=buy_hold`.
-- `data/`, `artifacts/`, `logs/` are gitignored；`seed_data/` 随仓库分发。
+- `data/`, `artifacts/`, `logs/` are gitignored; `seed_data/` ships with repo for cold-start.
 - Market scanner uses akshare for CN A-share real-time rankings (requires network, optional proxy via `MARKET_SCAN_HTTP_PROXY`).
 - DeepSeek API: default endpoint `https://api.deepseek.com/chat/completions` (no `/v1` prefix).
+- All config via pydantic-settings (`src/invest_system/config.py`). Env vars override `.env` file values.

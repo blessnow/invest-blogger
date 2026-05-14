@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+from invest_system.broker import Broker, create_broker
 from invest_system.cache_janitor import prune_data_cache
 from invest_system.config import Settings, load_settings
 from invest_system.live_phase import run_live_intraday_phase
@@ -34,11 +35,11 @@ LIVE_PHASES = (
 DEFAULT_TZ = "Asia/Shanghai"
 
 
-def _live_phase_job(settings: Settings, phase_key: str) -> None:
+def _live_phase_job(settings: Settings, phase_key: str, broker: Broker | None = None) -> None:
     log = logging.getLogger("scheduler.live")
     log.info("running live phase: %s", phase_key)
     try:
-        run_live_intraday_phase(settings, phase_key=phase_key)
+        run_live_intraday_phase(settings, phase_key=phase_key, broker=broker)
     except SystemExit as exc:
         log.warning("live %s exited: %s", phase_key, exc)
     except Exception:
@@ -63,13 +64,13 @@ def _cache_janitor_job(settings: Settings) -> None:
         log.exception("cache janitor failed")
 
 
-def build_scheduler(settings: Settings, *, tz: str = DEFAULT_TZ) -> BlockingScheduler:
+def build_scheduler(settings: Settings, *, tz: str = DEFAULT_TZ, broker: Broker | None = None) -> BlockingScheduler:
     sch = BlockingScheduler(timezone=tz)
     for phase, hour, minute in LIVE_PHASES:
         sch.add_job(
             _live_phase_job,
             CronTrigger(day_of_week="mon-fri", hour=hour, minute=minute, timezone=tz),
-            kwargs={"settings": settings, "phase_key": phase},
+            kwargs={"settings": settings, "phase_key": phase, "broker": broker},
             id=f"live_{phase}",
             replace_existing=True,
             coalesce=True,
@@ -84,6 +85,38 @@ def build_scheduler(settings: Settings, *, tz: str = DEFAULT_TZ) -> BlockingSche
         coalesce=True,
         misfire_grace_time=3600,
     )
+
+    # Evolution cycle (disabled by default, enable via EVOLUTION_ENABLED=true)
+    if getattr(settings, "evolution_enabled", False):
+        def _evolution_job(settings: Settings) -> None:
+            log = logging.getLogger("scheduler.evolution")
+            try:
+                from invest_system.evolution.evolver import run_evolution_cycle
+                result = run_evolution_cycle(settings)
+                if result:
+                    log.info("evolution accepted: genome=%s gen=%d", result.genome_id, result.generation)
+                else:
+                    log.info("evolution cycle complete, no changes accepted")
+            except Exception:
+                log.exception("evolution cycle failed")
+
+        cron_expr = getattr(settings, "evolution_schedule_cron", "0 18 * * 5").strip()
+        parts = cron_expr.split()
+        if len(parts) == 5:
+            sch.add_job(
+                _evolution_job,
+                CronTrigger(
+                    minute=parts[0], hour=parts[1],
+                    day=parts[2], month=parts[3],
+                    day_of_week=parts[4], timezone=tz,
+                ),
+                kwargs={"settings": settings},
+                id="evolution_cycle",
+                replace_existing=True,
+                coalesce=True,
+                misfire_grace_time=7200,
+            )
+
     return sch
 
 
@@ -160,16 +193,60 @@ def main(argv: list[str] | None = None) -> None:
     except Exception:
         log.exception("startup upgrade failed (non-fatal)")
 
+    # 启动时加载进化系统的 active genome（如有），使进化结果在重启后仍然生效
+    try:
+        from invest_system.evolution.genome import StrategyGenome
+        from invest_system.evolution.applier import GenomeApplier
+
+        genome_dir = getattr(settings, "evolution_genome_dir", Path("./data/evolution"))
+        if isinstance(genome_dir, str):
+            genome_dir = Path(genome_dir)
+        active = StrategyGenome.load_active(genome_dir)
+        if active and active.validation.accepted:
+            applier = GenomeApplier()
+            applier.apply(active, settings)
+            log.info(
+                "startup: loaded active genome %s (gen %d)",
+                active.genome_id,
+                active.generation,
+            )
+    except Exception:
+        log.exception("startup genome load failed (non-fatal)")
+
     if args.run_now == "cache":
         _cache_janitor_job(settings)
     elif args.run_now:
-        _live_phase_job(settings, args.run_now)
+        broker_mode = getattr(settings, "broker_mode", "paper").strip().lower()
+        broker = None
+        if broker_mode != "paper":
+            from invest_system.live_phase import load_live_portfolio
+            portfolio = load_live_portfolio(
+                state_path,
+                initial_capital=float(settings.initial_capital),
+                fee_rate=float(settings.commission_rate),
+                t_plus_1_enabled=bool(settings.t_plus_1_enabled),
+            )
+            broker = create_broker(broker_mode, portfolio, settings)
+        _live_phase_job(settings, args.run_now, broker)
 
-    sch = build_scheduler(settings, tz=args.tz)
+    broker_mode = getattr(settings, "broker_mode", "paper").strip().lower()
+    broker = None
+    if broker_mode != "paper":
+        from invest_system.live_phase import load_live_portfolio
+        portfolio = load_live_portfolio(
+            state_path,
+            initial_capital=float(settings.initial_capital),
+            fee_rate=float(settings.commission_rate),
+            t_plus_1_enabled=bool(settings.t_plus_1_enabled),
+        )
+        broker = create_broker(broker_mode, portfolio, settings)
+        log.info("broker mode: %s", broker_mode)
+
+    sch = build_scheduler(settings, tz=args.tz, broker=broker)
     _install_signal_handlers(sch)
 
     now = datetime.now(ZoneInfo(args.tz)).strftime("%Y-%m-%d %H:%M:%S")
-    log.info("scheduler started tz=%s now=%s jobs=%s", args.tz, now, [j.id for j in sch.get_jobs()])
+    log.info("scheduler started tz=%s now=%s jobs=%s broker=%s", args.tz, now, [j.id for j in sch.get_jobs()], broker_mode)
     sch.start()
 
 

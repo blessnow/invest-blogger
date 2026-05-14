@@ -21,6 +21,7 @@ dependencies = [
 invest-sim = "invest_system.cli:main"
 invest-live-phase = "invest_system.live_phase:main"
 invest-scheduler = "invest_system.scheduler:main"
+invest-evolve = "invest_system.evolution.cli:main"
 
 [build-system]
 requires = ["setuptools>=61", "wheel"]
