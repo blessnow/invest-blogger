@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
+from invest_system.broker import Broker, create_broker
 from invest_system.assistant.constants import INTRADAY_PHASES
 from invest_system.assistant.runner import run_single_intraday_phase
 from invest_system.benchmarks import format_benchmark_prices
@@ -209,7 +210,7 @@ def append_live_equity_csv(
     df_out.to_csv(csv_path, index=False)
 
 
-def run_live_intraday_phase(settings: Settings, *, phase_key: str) -> None:
+def run_live_intraday_phase(settings: Settings, *, phase_key: str, broker: Broker | None = None) -> None:
     if phase_key not in PHASE_BY_KEY:
         print(f"未知 phase，可选：{list(PHASE_BY_KEY)}", file=sys.stderr)
         sys.exit(2)
@@ -497,6 +498,7 @@ def run_live_intraday_phase(settings: Settings, *, phase_key: str) -> None:
             int(settings.lot_size),
             free_selection=free,
             ts=now,
+            broker=broker,
         )
     except Exception as exc:
         print(f"[live] DeepSeek/撮合异常（本轮不调仓）：{type(exc).__name__}: {exc}", file=sys.stderr)
@@ -544,7 +546,19 @@ def main(argv: list[str] | None = None) -> None:
         help="对应 INTRADAY_PHASES：pre_open / open_5m / midday / close",
     )
     args = p.parse_args(argv)
-    run_live_intraday_phase(load_settings(), phase_key=args.phase)
+    settings = load_settings()
+    broker_mode = getattr(settings, "broker_mode", "paper").strip().lower()
+    broker = None
+    if broker_mode != "paper":
+        state_path = Path(settings.live_portfolio_state_path)
+        portfolio = load_live_portfolio(
+            state_path,
+            initial_capital=float(settings.initial_capital),
+            fee_rate=float(settings.commission_rate),
+            t_plus_1_enabled=bool(settings.t_plus_1_enabled),
+        )
+        broker = create_broker(broker_mode, portfolio, settings)
+    run_live_intraday_phase(settings, phase_key=args.phase, broker=broker)
 
 
 if __name__ == "__main__":
