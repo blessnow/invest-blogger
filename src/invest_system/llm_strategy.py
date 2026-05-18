@@ -86,14 +86,14 @@ async def glm_decision(
         },
     )
     headers = {
-        "Authorization": f"Bearer {settings.deepseek_api_key}",
+        "Authorization": f"Bearer {settings.glm_api_key}",
         "Content-Type": "application/json",
     }
     async with httpx.AsyncClient(timeout=timeout) as client:
         r = await client.post(url, json=payload, headers=headers)
         r.raise_for_status()
         data = r.json()
-    content = data["content"][0]["text"]
+    content = data["choices"][0]["message"]["content"]
     return _extract_json(str(content))
 
 
@@ -120,14 +120,14 @@ def glm_decision_sync(
         },
     )
     headers = {
-        "Authorization": f"Bearer {settings.deepseek_api_key}",
+        "Authorization": f"Bearer {settings.glm_api_key}",
         "Content-Type": "application/json",
     }
     with httpx.Client(timeout=timeout) as client:
         r = client.post(url, json=payload, headers=headers)
         r.raise_for_status()
         data = r.json()
-    content = data["content"][0]["text"]
+    content = data["choices"][0]["message"]["content"]
     return _extract_json(str(content))
 
 
@@ -158,7 +158,7 @@ def glm_chat_completion_sync(
         },
     )
     headers = {
-        "Authorization": f"Bearer {settings.deepseek_api_key}",
+        "Authorization": f"Bearer {settings.glm_api_key}",
         "Content-Type": "application/json",
     }
     try:
@@ -166,7 +166,7 @@ def glm_chat_completion_sync(
             r = client.post(url, json=payload, headers=headers)
             r.raise_for_status()
             data = r.json()
-        content = data["content"][0]["text"]
+        content = data["choices"][0]["message"]["content"]
         return str(content).strip()
     except httpx.HTTPStatusError as exc:
         code = exc.response.status_code
