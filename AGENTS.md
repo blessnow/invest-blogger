@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Paper trading simulation system with DeepSeek LLM strategy and real market prices (Yahoo Finance + akshare).
+Paper trading simulation system with GLM-5 LLM strategy and real market prices (Yahoo Finance + akshare).
 
 ## Setup
 
@@ -10,7 +10,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Copy `example.env` to `.env` and set `DEEPSEEK_API_KEY` (required for `STRATEGY_MODE=llm`).
+Copy `example.env` to `.env` and set `ANTHROPIC_AUTH_TOKEN` (required for `STRATEGY_MODE=llm`).
 
 **PYTHONPATH**: Railway/Nixpacks only runs `pip install -r requirements.txt`, not an editable install. `scripts/start_railway.sh` sets `PYTHONPATH=src/` to load from source. For local runs without pip install, do the same.
 
@@ -54,7 +54,7 @@ python3 -m invest_system.live_phase --phase close      # 15:05
   - `cli.py` - Entry point for `invest-sim` command
   - `live_phase.py` - Entry point for intraday scheduled runs
   - `engine.py` - Core simulation loop (backtest)
-  - `llm_strategy.py` - DeepSeek API integration
+  - `llm_strategy.py` - GLM-5 API integration
   - `data_feed.py` - Yahoo Finance price fetching
   - `market_scanner.py` - akshare-based CN market scanning (free selection mode)
   - `dashboard.py` - Streamlit UI
@@ -64,7 +64,7 @@ python3 -m invest_system.live_phase --phase close      # 15:05
 
 All config via `.env` (pydantic-settings). Critical vars:
 
-- `DEEPSEEK_API_KEY` - Required for LLM strategy
+- `ANTHROPIC_AUTH_TOKEN` - Required for LLM strategy
 - `STRATEGY_MODE` - `llm` (default) or `buy_hold` (no API, for testing)
 - `SELECTION_MODE` - `fixed` (UNIVERSE only) or `free` (model picks from market scan)
 - `UNIVERSE` - Comma-separated Yahoo symbols (e.g., `600519.SS,300750.SZ`)

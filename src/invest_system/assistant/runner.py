@@ -19,7 +19,7 @@ from invest_system.assistant.gather import (
 )
 from invest_system.assistant.market_slice import build_phase_market_notes
 from invest_system.config import Settings
-from invest_system.llm_strategy import deepseek_chat_completion_sync
+from invest_system.llm_strategy import glm_chat_completion_sync
 from invest_system.portfolio import Portfolio
 
 
@@ -283,7 +283,7 @@ def run_single_intraday_phase(
         positions,
         equity,
     )
-    article_text = deepseek_chat_completion_sync(
+    article_text = glm_chat_completion_sync(
         settings,
         system_prompt=BLOGGER_SYSTEM,
         user_prompt=user_art,

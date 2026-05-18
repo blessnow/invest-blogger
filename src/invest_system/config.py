@@ -13,27 +13,22 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    deepseek_api_key: str = Field(default="", validation_alias="DEEPSEEK_API_KEY")
-    deepseek_base_url: str = Field(
-        default="https://api.deepseek.com",
-        validation_alias="DEEPSEEK_BASE_URL",
+    glm_api_key: str = Field(default="", validation_alias="ANTHROPIC_AUTH_TOKEN")
+    glm_base_url: str = Field(
+        default="https://open.bigmodel.cn/api/anthropic",
+        validation_alias="ANTHROPIC_BASE_URL",
     )
-    deepseek_model: str = Field(
-        default="deepseek-chat",
-        validation_alias="DEEPSEEK_MODEL",
+    glm_model: str = Field(
+        default="glm-5",
+        validation_alias="ANTHROPIC_MODEL",
     )
-    #: 相对 BASE；官方控制台 curl 多为 chat/completions（无 v1）。若你使用 OpenAI 兼容客户端则常是 v1/chat/completions
-    deepseek_chat_path: str = Field(
+    glm_chat_path: str = Field(
         default="chat/completions",
-        validation_alias="DEEPSEEK_CHAT_PATH",
+        validation_alias="ANTHROPIC_CHAT_PATH",
     )
-    deepseek_stream: bool = Field(default=False, validation_alias="DEEPSEEK_STREAM")
-    #: 非空时写入 JSON：thinking = {"type": "<值>"}，如 enabled（deepseek-v4-pro 等）
-    deepseek_thinking_type: str = Field(default="", validation_alias="DEEPSEEK_THINKING_TYPE")
-    #: 如 high / medium / low
-    deepseek_reasoning_effort: str = Field(default="", validation_alias="DEEPSEEK_REASONING_EFFORT")
-    #: 合并进请求体的合法 JSON 对象（优先级低于同名键时请避免冲突）
-    deepseek_extra_json: str = Field(default="", validation_alias="DEEPSEEK_EXTRA_JSON")
+    glm_stream: bool = Field(default=False, validation_alias="ANTHROPIC_STREAM")
+    glm_temperature: float = Field(default=0.2, validation_alias="ANTHROPIC_TEMPERATURE")
+    glm_max_tokens: int = Field(default=4096, validation_alias="ANTHROPIC_MAX_TOKENS")
 
     initial_capital: float = Field(default=100_000.0, validation_alias="INITIAL_CAPITAL")
     universe: str = Field(
@@ -255,11 +250,11 @@ class Settings(BaseSettings):
 
     def assistant_llm_model(self) -> str:
         m = self.assistant_model.strip()
-        return m if m else self.deepseek_model
+        return m if m else self.glm_model
 
-    def deepseek_completions_url(self) -> str:
-        base = self.deepseek_base_url.strip().rstrip("/")
-        path = self.deepseek_chat_path.strip().lstrip("/")
+    def glm_completions_url(self) -> str:
+        base = self.glm_base_url.strip().rstrip("/")
+        path = self.glm_chat_path.strip().lstrip("/")
         return f"{base}/{path}"
 
 

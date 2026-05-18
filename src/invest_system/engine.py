@@ -17,7 +17,7 @@ from invest_system.market_scanner import scan_cn_candidates_with_akshare
 from invest_system.market_context import fetch_external_context
 from invest_system.llm_strategy import (
     build_user_prompt,
-    deepseek_decision_sync,
+    glm_decision_sync,
     system_prompt_for,
 )
 from invest_system.portfolio import Portfolio
@@ -608,7 +608,7 @@ def run_simulation(
                     rebalance_every_days=int(settings.rebalance_every_days),
                 )
                 try:
-                    decision = deepseek_decision_sync(
+                    decision = glm_decision_sync(
                         settings,
                         system_prompt=system_prompt_for(settings.selection_mode),
                         user_prompt=user,

@@ -1,6 +1,6 @@
-"""DeepSeek 文本对话：当前采用「引擎预先拼装上下文」的单轮 JSON 输出。
+"""GLM-5 文本对话：当前采用「引擎预先拼装上下文」的单轮 JSON 输出。
 
-若需要 Function Calling / 工具循环（多轮 tool_calls）：需在 deepseek_decision_sync 中扩展
+若需要 Function Calling / 工具循环（多轮 tool_calls）：需在 glm_decision_sync 中扩展
 payload.tools 与解析 message.tool_calls 的循环；典型工具（查持仓、拉行情）与本项目重复，
 持仓与资金请以本模块 build_user_prompt 中的「账户快照」为准。
 
@@ -40,27 +40,14 @@ def set_llm_params(params: dict[str, float]) -> None:
     _LLM_PARAMS.update(params)
 
 
-def _apply_deepseek_request_extensions(settings: Settings, payload: dict[str, Any]) -> dict[str, Any]:
-    """合并官方文档/extra 中与模型相关的可选字段（thinking、reasoning_effort、stream 等）。"""
+def _apply_glm_request_extensions(settings: Settings, payload: dict[str, Any]) -> dict[str, Any]:
+    """合并 GLM 模型相关的可选参数。"""
     out = dict(payload)
-    out["stream"] = bool(settings.deepseek_stream)
-    tt = settings.deepseek_thinking_type.strip()
-    if tt:
-        out["thinking"] = {"type": tt}
-    re_eff = settings.deepseek_reasoning_effort.strip()
-    if re_eff:
-        out["reasoning_effort"] = re_eff
-    extra = settings.deepseek_extra_json.strip()
-    if extra:
-        try:
-            blob = json.loads(extra)
-            if isinstance(blob, dict):
-                out.update(blob)
-        except json.JSONDecodeError:
-            print(
-                "[invest-system] DEEPSEEK_EXTRA_JSON 不是合法 JSON，已忽略。",
-                file=sys.stderr,
-            )
+    out["stream"] = bool(settings.glm_stream)
+    out["max_tokens"] = settings.glm_max_tokens
+    extra = settings.glm_temperature
+    if extra != 0.2:  # Only add if not default
+        out["temperature"] = extra
     return out
 
 
@@ -76,21 +63,21 @@ def _extract_json(text: str) -> dict[str, Any]:
     raise ValueError("Model did not return valid JSON")
 
 
-async def deepseek_decision(
+async def glm_decision(
     settings: Settings,
     *,
     system_prompt: str,
     user_prompt: str,
     timeout: float = 120.0,
 ) -> dict[str, Any]:
-    if not settings.deepseek_api_key:
-        raise RuntimeError("DEEPSEEK_API_KEY is not set")
+    if not settings.glm_api_key:
+        raise RuntimeError("ANTHROPIC_AUTH_TOKEN is not set")
 
-    url = settings.deepseek_completions_url()
-    payload = _apply_deepseek_request_extensions(
+    url = settings.glm_completions_url()
+    payload = _apply_glm_request_extensions(
         settings,
         {
-            "model": settings.deepseek_model,
+            "model": settings.glm_model,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -106,25 +93,25 @@ async def deepseek_decision(
         r = await client.post(url, json=payload, headers=headers)
         r.raise_for_status()
         data = r.json()
-    content = data["choices"][0]["message"]["content"]
+    content = data["content"][0]["text"]
     return _extract_json(str(content))
 
 
-def deepseek_decision_sync(
+def glm_decision_sync(
     settings: Settings,
     *,
     system_prompt: str,
     user_prompt: str,
     timeout: float = 120.0,
 ) -> dict[str, Any]:
-    if not settings.deepseek_api_key:
-        raise RuntimeError("DEEPSEEK_API_KEY is not set")
+    if not settings.glm_api_key:
+        raise RuntimeError("ANTHROPIC_AUTH_TOKEN is not set")
 
-    url = settings.deepseek_completions_url()
-    payload = _apply_deepseek_request_extensions(
+    url = settings.glm_completions_url()
+    payload = _apply_glm_request_extensions(
         settings,
         {
-            "model": settings.deepseek_model,
+            "model": settings.glm_model,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -140,11 +127,11 @@ def deepseek_decision_sync(
         r = client.post(url, json=payload, headers=headers)
         r.raise_for_status()
         data = r.json()
-    content = data["choices"][0]["message"]["content"]
+    content = data["content"][0]["text"]
     return _extract_json(str(content))
 
 
-def deepseek_chat_completion_sync(
+def glm_chat_completion_sync(
     settings: Settings,
     *,
     system_prompt: str,
@@ -154,12 +141,12 @@ def deepseek_chat_completion_sync(
     timeout: float = 120.0,
 ) -> str:
     """通用文本补全（看盘短文等），非 JSON 模式。"""
-    if not settings.deepseek_api_key:
+    if not settings.glm_api_key:
         return ""
 
-    url = settings.deepseek_completions_url()
-    use_model = (model or "").strip() or settings.deepseek_model
-    payload = _apply_deepseek_request_extensions(
+    url = settings.glm_completions_url()
+    use_model = (model or "").strip() or settings.glm_model
+    payload = _apply_glm_request_extensions(
         settings,
         {
             "model": use_model,
@@ -179,13 +166,13 @@ def deepseek_chat_completion_sync(
             r = client.post(url, json=payload, headers=headers)
             r.raise_for_status()
             data = r.json()
-        content = data["choices"][0]["message"]["content"]
+        content = data["content"][0]["text"]
         return str(content).strip()
     except httpx.HTTPStatusError as exc:
         code = exc.response.status_code
         print(
-            f"[invest-system] DeepSeek 文本生成 HTTP {code}（看盘短文等），将用模板。"
-            " 请核对 DEEPSEEK_API_KEY、账户余额与 DEEPSEEK_MODEL 是否可用。",
+            f"[invest-system] GLM 文本生成 HTTP {code}（看盘短文等），将用模板。"
+            " 请核对 ANTHROPIC_AUTH_TOKEN、账户余额与 ANTHROPIC_MODEL 是否可用。",
             file=sys.stderr,
         )
         return ""
