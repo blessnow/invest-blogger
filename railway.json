@@ -3,7 +3,7 @@
   "deploy": {
     "numReplicas": 1,
     "healthcheckPath": "/",
-    "healthcheckTimeout": 60,
+    "healthcheckTimeout": 300,
     "restartPolicyType": "on-failure",
     "startCommand": "bash scripts/start_railway.sh"
   }
