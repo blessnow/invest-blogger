@@ -6,7 +6,7 @@ import json
 from typing import Any, Callable
 
 from invest_system.config import Settings
-from invest_system.llm_strategy import deepseek_decision_sync, _extract_json
+from invest_system.llm_strategy import glm_decision_sync, _extract_json
 from invest_system.evolution.genome import StrategyGenome
 from invest_system.evolution.analyzer import AnalysisReport
 
@@ -211,7 +211,7 @@ def propose_mutation(
     )
 
     try:
-        response = deepseek_decision_sync(
+        response = glm_decision_sync(
             settings,
             system_prompt=EVOLUTION_SYSTEM_PROMPT,
             user_prompt=user_prompt,

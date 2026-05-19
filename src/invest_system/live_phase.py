@@ -25,7 +25,7 @@ from invest_system.data_feed import (
 from invest_system.engine import _apply_actions, _build_candidate_pool, _fmt_recent_bars
 from invest_system.llm_strategy import (
     build_user_prompt,
-    deepseek_decision_sync,
+    glm_decision_sync,
     system_prompt_for,
 )
 from invest_system.market_context import fetch_external_context
@@ -433,7 +433,7 @@ def run_live_intraday_phase(settings: Settings, *, phase_key: str) -> None:
         fill_prices.setdefault(sym, px)
 
     try:
-        decision = deepseek_decision_sync(
+        decision = glm_decision_sync(
             settings,
             system_prompt=system_prompt_for(settings.selection_mode),
             user_prompt=user,
