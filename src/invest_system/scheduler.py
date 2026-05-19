@@ -39,7 +39,7 @@ def _live_phase_job(settings: Settings, phase_key: str, broker: Broker | None = 
     log = logging.getLogger("scheduler.live")
     log.info("running live phase: %s", phase_key)
     try:
-        run_live_intraday_phase(settings, phase_key=phase_key, broker=broker)
+        run_live_intraday_phase(settings, phase_key=phase_key)
     except SystemExit as exc:
         log.warning("live %s exited: %s", phase_key, exc)
     except Exception:
