@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     glm_api_key: str = Field(default="", validation_alias="ANTHROPIC_AUTH_TOKEN")
     glm_base_url: str = Field(
-        default="https://open.bigmodel.cn/api/anthropic",
+        default="https://open.bigmodel.cn/api/paas/v4",
         validation_alias="ANTHROPIC_BASE_URL",
     )
     glm_model: str = Field(
