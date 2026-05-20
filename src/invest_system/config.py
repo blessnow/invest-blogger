@@ -101,7 +101,7 @@ class Settings(BaseSettings):
         validation_alias="MARKET_SCAN_PROBE_TIMEOUT_SEC",
     )
 
-    intraday_assistant: str = Field(default="false", validation_alias="INTRADAY_ASSISTANT")
+    intraday_assistant: str = Field(default="true", validation_alias="INTRADAY_ASSISTANT")
     assistant_artifacts_dir: Path = Field(
         default=Path("./data/articles"),
         validation_alias="ASSISTANT_ARTIFACTS_DIR",
