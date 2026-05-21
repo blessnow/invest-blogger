@@ -24,10 +24,10 @@ def _list_prefixes(data_dir: Path) -> list[str]:
         name = f.name
         if name.endswith("_equity.csv"):
             out.append(name[: -len("_equity.csv")])
-    pref = "live_intraday"
-    if pref in out:
-        out.remove(pref)
-        out.insert(0, pref)
+    for pref in ("rotation", "live_intraday"):
+        if pref in out:
+            out.remove(pref)
+            out.insert(0, pref)
     return out
 
 
