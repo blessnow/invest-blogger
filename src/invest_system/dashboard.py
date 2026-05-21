@@ -5,6 +5,7 @@ from datetime import datetime
 
 import pandas as pd
 import streamlit as st
+import yfinance as yf
 
 from invest_system.auth import require_login
 from invest_system.bootstrap import ensure_data_seeded
@@ -102,14 +103,34 @@ def _get_current_positions(tx_df: pd.DataFrame) -> pd.DataFrame:
             else:
                 positions[sym] = new_shares
     
+    # 获取当前股价
+    current_prices = {}
+    for sym in positions.keys():
+        try:
+            ticker = yf.Ticker(sym)
+            current_prices[sym] = ticker.history(period="1d")["Close"].iloc[-1] if not ticker.history(period="1d").empty else 0
+        except Exception:
+            current_prices[sym] = 0
+    
     result = []
     for sym, shares in positions.items():
         if shares > 0:
+            cost_price = avg_cost.get(sym, 0)
+            current_price = current_prices.get(sym, 0)
+            market_value = shares * current_price
+            cost_value = shares * cost_price
+            unrealized_pnl = market_value - cost_value
+            unrealized_pnl_pct = (current_price / cost_price - 1) * 100 if cost_price > 0 else 0
+            
             result.append({
                 "股票代码": sym,
                 "股票名称": next((row.get("name", "") for _, row in tx_df.iterrows() if row.get("symbol") == sym), ""),
                 "持仓数量": int(shares),
-                "成本价": round(avg_cost.get(sym, 0), 2)
+                "成本价": round(cost_price, 2),
+                "当前价": round(current_price, 2),
+                "市值": round(market_value, 2),
+                "浮动收益": round(unrealized_pnl, 2),
+                "浮动收益率(%)": round(unrealized_pnl_pct, 2)
             })
     
     if not result:
@@ -290,10 +311,31 @@ def main() -> None:
         if positions_df.empty:
             st.info("当前无持仓")
         else:
-            st.dataframe(positions_df, width="stretch")
+            # 配置列显示格式
+            col_cfg = {}
+            if "成本价" in positions_df.columns:
+                col_cfg["成本价"] = st.column_config.NumberColumn("成本价", format="%.2f")
+            if "当前价" in positions_df.columns:
+                col_cfg["当前价"] = st.column_config.NumberColumn("当前价", format="%.2f")
+            if "市值" in positions_df.columns:
+                col_cfg["市值"] = st.column_config.NumberColumn("市值", format="%.2f")
+            if "浮动收益" in positions_df.columns:
+                col_cfg["浮动收益"] = st.column_config.NumberColumn("浮动收益", format="%.2f")
+            if "浮动收益率(%)" in positions_df.columns:
+                col_cfg["浮动收益率(%)"] = st.column_config.NumberColumn("浮动收益率(%)", format="%.2f%%")
+            
+            st.dataframe(positions_df, width="stretch", column_config=col_cfg)
             
             total_positions = positions_df["持仓数量"].sum()
-            st.markdown(f"**持仓股票数**: {len(positions_df)} | **总持仓股数**: {total_positions}")
+            total_market_value = positions_df["市值"].sum() if "市值" in positions_df.columns else 0
+            total_unrealized_pnl = positions_df["浮动收益"].sum() if "浮动收益" in positions_df.columns else 0
+            
+            st.markdown(
+                f"**持仓股票数**: {len(positions_df)} | "
+                f"**总持仓股数**: {total_positions} | "
+                f"**总市值**: {total_market_value:,.2f} | "
+                f"**总浮动收益**: {total_unrealized_pnl:,.2f}"
+            )
 
     with tab3:
         st.subheader("交易历史")
