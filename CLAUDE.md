@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A-share paper/real trading system powered by DeepSeek LLM for portfolio rebalancing. Supports backtesting, live intraday trading (4 phases), self-evolving strategies, and a Streamlit dashboard. Single Procfile deploys to Railway with persistent volumes.
+A-share paper/real trading system powered by an LLM (default: GLM-5 via 智谱AI's Anthropic-compatible endpoint, configured by `ANTHROPIC_AUTH_TOKEN`) for portfolio rebalancing. Supports backtesting, live intraday trading (4 phases), self-evolving strategies, and a Streamlit dashboard. Single Procfile deploys to Railway with persistent volumes.
 
 ## Setup & Development
 
 ```bash
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-cp example.env .env   # fill DEEPSEEK_API_KEY (can be empty for STRATEGY_MODE=buy_hold)
+cp example.env .env   # fill ANTHROPIC_AUTH_TOKEN (can be empty for STRATEGY_MODE=buy_hold)
 export PYTHONPATH=src  # CRITICAL: required for local runs without pip install -e
 ```
 
@@ -36,6 +36,8 @@ STRATEGY_MODE=buy_hold invest-sim
 | Dashboard | `./scripts/start_dashboard.sh` (or `streamlit run src/invest_system/dashboard.py`) |
 | Scheduler daemon | `invest-scheduler` or `python3 -m invest_system.scheduler` |
 | Single live phase | `python3 -m invest_system.live_phase --phase pre_open \|open_5m\|midday\|close` |
+| Rotation 手动调仓（14:45 同款） | `python3 -m invest_system.live_rotation` |
+| Rotation 通过 scheduler 立即触发 | `invest-scheduler --run-now rotation` |
 | Evolution analyze | `invest-evolve analyze` |
 | Evolution status | `invest-evolve status` |
 | Rollback genome | `invest-evolve rollback <genome_id>` |
@@ -52,6 +54,15 @@ python3 -c "from invest_system.market_scanner import MarketScanner; scanner = Ma
 ```
 
 **Live phases** run at market times: `pre_open` (9:20), `open_5m` (9:35), `midday` (11:30), `close` (15:05). Scheduler daemon (APScheduler) auto-runs all 4 phases Mon-Fri + cache cleanup at 16:30.
+
+**Rotation 实盘节点**：单独的 14:45 调仓任务，独立账户：
+- 触发条件：`STRATEGY_MODE=rotation` 或 `ROTATION_LIVE_ENABLED=true`
+- 入口：`python3 -m invest_system.live_rotation`（手动）或 scheduler 自动
+- 状态文件：`data/rotation_portfolio_state.json`
+- 权益 CSV：`data/rotation_equity.csv`
+- 交易 CSV：`data/rotation_transactions.csv`
+- Dashboard 页：tab "🔄 行业轮动"
+- 数据源：akshare `fund_etf_spot_em` 拉 31 只 ETF 实时价（约 14 秒）
 
 ## Architecture
 
@@ -81,6 +92,10 @@ python3 -c "from invest_system.market_scanner import MarketScanner; scanner = Ma
   - `applier.py` — Apply validated mutations to strategy
   - `cli.py` — Command-line interface
 - `engine_hooks.py` — Extensible hooks (pre/post trade, end-of-day) for custom logic injection
+- `errors.py` — 结构化错误日志（`data/phase_errors.jsonl`）+ LLM 原始响应落盘（`data/llm_raw/`）；取代静默 except
+- `strategies/momentum.py` — 双均线 + 截面动量 + 大盘择时（无 LLM）。参数全部可通过 `MOMENTUM_*` 环境变量调整
+- `strategies/mainline.py` + `mainline_scanner.py` — 游资短线追主升浪：每日从 akshare 历史涨停池 + 龙虎榜筛连板龙头，按"行业聚集度 + 连板数"打分，集中持仓 top-K 直到退出候选池。持仓股豁免市值/远端过滤（sticky）避免高买低卖。数据按日缓存到 `data/mainline_cache/`。**实测：2026-05 那 21 天暴涨期 +61%，但 2025 全年 -68%（仅适合主升浪行情）**
+- `strategies/rotation.py` + `local_data_loader.py` — **推荐策略**：行业 ETF 周度轮动。31 个行业 ETF 候选（半导体/医药/军工/酒/银行/新能源/有色等），每 5 交易日按 20 日动量选 top-3 等权持有，HS300 跌破 MA60 全空仓，单只 ETF -8% 止损。极少参数、不易过拟合、回撤可控。**实测：2025 全年 +34.29% / 最大回撤 -13.02%，超额沪深300 +12.54pp**。依赖本地 Tushare `etf_daily.csv` 数据
 - `auth.py` — Streamlit session auth (user/pass or token-based)
 - `cache_janitor.py` — Prune old OHLCV/price caches (configurable by age)
 - `market_context.py` — Optional HTTP service to fetch sentiment, news summaries, or external signals for LLM context
@@ -97,7 +112,7 @@ python3 -c "from invest_system.market_scanner import MarketScanner; scanner = Ma
 - Enable with `EVOLUTION_ENABLED=true` in `.env`
 
 **Key modes** (via `.env`):
-- `STRATEGY_MODE`: `llm` (DeepSeek) | `buy_hold` (equal-weight, no API)
+- `STRATEGY_MODE`: `llm` (GLM-5) | `buy_hold` | `momentum` (双均线+截面动量+大盘择时) | `mainline` (游资派连板龙头) | **`rotation`** (推荐：31 行业 ETF 周度轮动，2025 真实回测 **+34.29% / 最大回撤 -13%**，超额沪深300 +12.54pp)
 - `SELECTION_MODE`: `fixed` (trade only UNIVERSE) | `free` (LLM picks any A-share; requires akshare scan)
 - `BROKER_MODE`: `paper` (simulation) | `jvquant` (live trading; requires jvQuant account)
 - `EVOLUTION_ENABLED`: `true` (auto-mutate strategy) | `false`
@@ -143,7 +158,7 @@ python3 -c "from invest_system.market_scanner import MarketScanner; scanner = Ma
 
 1. Create a Volume; mount at `/data`
 2. Set env vars:
-   - `DEEPSEEK_API_KEY` (required if `STRATEGY_MODE=llm`)
+   - `ANTHROPIC_AUTH_TOKEN` (required if `STRATEGY_MODE=llm`; optional overrides: `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL`)
    - `DATA_DIR=/data`
    - `ASSISTANT_ARTIFACTS_DIR=/data/articles`
    - `LIVE_PORTFOLIO_STATE_PATH=/data/live_portfolio_state.json`
@@ -160,14 +175,14 @@ python3 -c "from invest_system.market_scanner import MarketScanner; scanner = Ma
 - Lot size: 100 shares (A-share standard), configurable via `LOT_SIZE`
 - T+1 enforced by default (`T_PLUS_1_ENABLED=true`); set to `false` to bypass in backtest
 - Commission: single-side 0.00025 (approximation; can be overridden)
-- DeepSeek: endpoint `https://api.deepseek.com/chat/completions` (no `/v1` prefix)
+- LLM endpoint defaults to GLM-5 at `https://open.bigmodel.cn/api/anthropic` (override via `ANTHROPIC_BASE_URL`)
 - No test suite — verify via `STRATEGY_MODE=buy_hold invest-sim` (pure buy-and-hold, no LLM)
 - No linter/formatter configured
 - Data directories: `data/` runtime, `seed_data/` committed
 - All config via `.env` and environment variables
 
 **Environment variable priorities** (highest to lowest):
-1. Command-line exports (e.g., `export DEEPSEEK_API_KEY=xyz`)
+1. Command-line exports (e.g., `export ANTHROPIC_AUTH_TOKEN=xyz`)
 2. System environment variables
 3. `.env` file values
 4. Default values in `config.py`

@@ -52,15 +52,70 @@ def _apply_glm_request_extensions(settings: Settings, payload: dict[str, Any]) -
 
 
 def _extract_json(text: str) -> dict[str, Any]:
+    """strict JSON 解析：先按整体解析，失败再退回贪婪 {…}。
+
+    解析结果必须是 dict，否则抛 ValueError 让上层落盘原始响应回查。
+    """
     text = text.strip()
+    # 去除 markdown 围栏
+    if text.startswith("```"):
+        text = re.sub(r"^```[a-zA-Z]*\n?", "", text)
+        text = re.sub(r"\n?```$", "", text)
+        text = text.strip()
     try:
-        return json.loads(text)
+        data = json.loads(text)
     except json.JSONDecodeError:
-        pass
-    m = re.search(r"\{[\s\S]*\}", text)
-    if m:
-        return json.loads(m.group())
-    raise ValueError("Model did not return valid JSON")
+        m = re.search(r"\{[\s\S]*\}", text)
+        if not m:
+            raise ValueError("Model did not return any JSON object")
+        try:
+            data = json.loads(m.group())
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Model JSON malformed: {exc}") from exc
+    if not isinstance(data, dict):
+        raise ValueError(f"Expected JSON object, got {type(data).__name__}")
+    return data
+
+
+def validate_decision(decision: dict[str, Any]) -> list[dict[str, Any]]:
+    """校验 LLM 决策并返回干净的 actions 列表。
+
+    严格规则：
+      - decision 必须是 dict；缺 actions 字段 → 视为观望 []
+      - actions 必须是 list；非 list → 抛 ValueError
+      - 每个 action 必须有 symbol(str) / side(buy|sell) / shares(int>0)
+      - 非法 action 跳过并记录，不阻断整体
+    """
+    if not isinstance(decision, dict):
+        raise ValueError(f"decision must be dict, got {type(decision).__name__}")
+    actions = decision.get("actions", [])
+    if actions is None:
+        return []
+    if not isinstance(actions, list):
+        raise ValueError(f"actions must be list, got {type(actions).__name__}")
+
+    cleaned: list[dict[str, Any]] = []
+    for idx, a in enumerate(actions):
+        if not isinstance(a, dict):
+            continue
+        sym = str(a.get("symbol", "")).strip().upper()
+        side = str(a.get("side", "")).strip().lower()
+        if not sym or side not in ("buy", "sell"):
+            continue
+        raw_shares = a.get("shares", 0)
+        try:
+            shares = int(float(raw_shares))
+        except (TypeError, ValueError):
+            continue
+        if shares <= 0:
+            continue
+        cleaned.append({
+            "symbol": sym,
+            "side": side,
+            "shares": shares,
+            "reason": str(a.get("reason", ""))[:80],
+        })
+    return cleaned
 
 
 async def glm_decision(
@@ -103,7 +158,14 @@ def glm_decision_sync(
     system_prompt: str,
     user_prompt: str,
     timeout: float = 120.0,
+    phase: str = "backtest",
+    day: str = "",
 ) -> dict[str, Any]:
+    """同步调用 LLM 并返回解析后的 JSON dict。
+
+    JSON 解析失败时把原始响应落盘到 data/llm_raw/<day>/<phase>_*.json
+    供事后回查，避免静默吞错。
+    """
     if not settings.glm_api_key:
         raise RuntimeError("ANTHROPIC_AUTH_TOKEN is not set")
 
@@ -127,8 +189,22 @@ def glm_decision_sync(
         r = client.post(url, json=payload, headers=headers)
         r.raise_for_status()
         data = r.json()
-    content = data["choices"][0]["message"]["content"]
-    return _extract_json(str(content))
+    content = str(data["choices"][0]["message"]["content"])
+    try:
+        return _extract_json(content)
+    except ValueError as exc:
+        # 延迟 import 避免循环
+        from invest_system.errors import dump_llm_raw, log_error
+        dump_llm_raw(
+            phase=phase, day=day,
+            system_prompt=system_prompt, user_prompt=user_prompt,
+            raw_response=content, error=exc,
+        )
+        log_error(
+            component="llm_strategy", phase=phase,
+            error=exc, message="LLM JSON 解析失败，原始响应已落盘到 data/llm_raw/",
+        )
+        raise
 
 
 def glm_chat_completion_sync(

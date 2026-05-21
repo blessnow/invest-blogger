@@ -2,6 +2,14 @@
 
 Paper trading simulation system with GLM-5 LLM strategy and real market prices (Yahoo Finance + akshare).
 
+## For AI coding agents
+
+- Use `AGENTS.md` and `CLAUDE.md` as the primary workspace guidance for setup, commands, and architecture.
+- This repo does not include a dedicated test suite, so prefer manual verification via the provided entry points.
+- Always activate the virtual environment and install dependencies from `requirements.txt` before running or editing code.
+- Use `PYTHONPATH=src` for local development unless the package is installed in editable mode.
+- `data/`, `logs/`, and `seed_data/` are runtime/cache artifacts; treat them as generated data rather than source code.
+
 ## Setup
 
 ```bash

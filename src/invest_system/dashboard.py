@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from datetime import datetime
 
@@ -263,12 +264,13 @@ def main() -> None:
 
     st.markdown("---")
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "📊 权益曲线",
         "💼 当前持仓",
         "📝 交易记录",
         "📅 每日汇总",
-        "📰 看盘文章"
+        "📰 看盘文章",
+        "🚨 错误监控",
     ])
 
     with tab1:
@@ -470,9 +472,48 @@ def main() -> None:
             )
             
             selected_dir = article_root / selected_day
-            
+
             st.markdown(f"**日期**: {selected_day}")
             _render_articles(selected_dir)
+
+    with tab6:
+        st.subheader("最近错误（实盘 / 回测 / LLM）")
+        st.caption("来源：data/phase_errors.jsonl ｜ LLM 原始响应：data/llm_raw/<日期>/")
+        from invest_system.errors import read_recent_errors
+
+        col_a, col_b = st.columns([1, 4])
+        with col_a:
+            limit = st.number_input("条数上限", min_value=10, max_value=500, value=50, step=10)
+        records = read_recent_errors(limit=int(limit))
+        if not records:
+            st.success("暂无错误记录 ✅")
+        else:
+            # 汇总
+            comp_counts: dict[str, int] = {}
+            for r in records:
+                key = f"{r.get('component', '?')}/{r.get('phase', '')}"
+                comp_counts[key] = comp_counts.get(key, 0) + 1
+            st.markdown("**按组件汇总**")
+            st.write({k: v for k, v in sorted(comp_counts.items(), key=lambda x: -x[1])})
+
+            # 详细列表（pandas DataFrame）
+            df_err = pd.DataFrame([
+                {
+                    "时间": r.get("ts", ""),
+                    "组件": r.get("component", ""),
+                    "阶段": r.get("phase", ""),
+                    "标的": r.get("symbol", ""),
+                    "类型": r.get("error_type", ""),
+                    "消息": r.get("message", ""),
+                    "异常": r.get("error_msg", ""),
+                }
+                for r in records
+            ])
+            st.dataframe(df_err, use_container_width=True, hide_index=True)
+
+            with st.expander("查看 traceback / extra（点击展开最近一条）"):
+                top = records[0]
+                st.json(top)
 
 
 if __name__ == "__main__":

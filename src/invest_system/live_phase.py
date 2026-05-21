@@ -23,10 +23,12 @@ from invest_system.data_feed import (
     latest_row,
 )
 from invest_system.engine import _apply_actions, _build_candidate_pool, _fmt_recent_bars
+from invest_system.errors import log_error
 from invest_system.llm_strategy import (
     build_user_prompt,
     glm_decision_sync,
     system_prompt_for,
+    validate_decision,
 )
 from invest_system.market_context import fetch_external_context
 from invest_system.market_scanner import scan_cn_candidates_with_akshare
@@ -55,7 +57,12 @@ def load_live_portfolio(
         )
     try:
         blob = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+    except Exception as exc:
+        log_error(
+            component="live_phase", phase="load_portfolio",
+            error=exc,
+            message=f"实盘持仓 JSON 解析失败，回退到初始资金：{path}",
+        )
         return Portfolio(
             cash=float(initial_capital),
             fee_rate=float(fee_rate),
@@ -437,10 +444,10 @@ def run_live_intraday_phase(settings: Settings, *, phase_key: str) -> None:
             settings,
             system_prompt=system_prompt_for(settings.selection_mode),
             user_prompt=user,
+            phase=phase_key,
+            day=str(decision_day),
         )
-        actions = decision.get("actions") if isinstance(decision, dict) else []
-        if not isinstance(actions, list):
-            actions = []
+        actions = validate_decision(decision)
 
         executable_actions: list[dict[str, Any]] = actions
         if free and bool(settings.free_selection_enforce_candidates):
@@ -448,12 +455,8 @@ def run_live_intraday_phase(settings: Settings, *, phase_key: str) -> None:
             hold_set = set(portfolio.positions.keys())
             executable_actions = []
             for a in actions:
-                if not isinstance(a, dict):
-                    continue
-                sym = str(a.get("symbol", "")).upper().strip()
-                if not sym:
-                    continue
-                side = str(a.get("side", "")).lower().strip()
+                sym = a["symbol"]
+                side = a["side"]
                 if side == "sell":
                     if sym in hold_set:
                         executable_actions.append(a)
@@ -499,7 +502,16 @@ def run_live_intraday_phase(settings: Settings, *, phase_key: str) -> None:
             ts=now,
         )
     except Exception as exc:
-        print(f"[live] DeepSeek/撮合异常（本轮不调仓）：{type(exc).__name__}: {exc}", file=sys.stderr)
+        log_error(
+            component="live_phase", phase=phase_key,
+            error=exc,
+            message="LLM/撮合异常，本轮不调仓",
+            extra={
+                "day": str(decision_day),
+                "cash": round(portfolio.cash, 2),
+                "num_holdings": len(portfolio.positions),
+            },
+        )
 
     save_live_portfolio(state_path, portfolio)
     append_live_equity_csv(

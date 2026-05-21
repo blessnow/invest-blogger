@@ -79,14 +79,34 @@ def ensure_panel_has_symbols(
     end: str,
     cache_dir: Path,
 ) -> pd.DataFrame:
+    """补全 panel 包含 symbols 列。优先使用本地 daily.csv 数据，yfinance 降级。"""
     work = panel
     seen: set[str] = set()
     if not work.empty and isinstance(work.columns, pd.MultiIndex):
         seen = set(work.columns.get_level_values(0).astype(str).unique())
 
-    for raw_sym in symbols:
-        sym = raw_sym.strip().upper()
-        if not sym or sym in seen:
+    missing = [s.strip().upper() for s in symbols if s.strip().upper() and s.strip().upper() not in seen]
+    if not missing:
+        return work
+
+    # 优先尝试本地数据
+    try:
+        from invest_system.local_data_loader import (
+            DEFAULT_LOCAL_DIR, load_all_panels, build_panel_from_local,
+        )
+        if (DEFAULT_LOCAL_DIR / "daily.csv").exists():
+            panels = load_all_panels(cache_dir)
+            local_frag, still_missing = build_panel_from_local(panels, missing, start, end)
+            if not local_frag.empty:
+                work = merge_price_panels(work, local_frag)
+                seen.update(local_frag.columns.get_level_values(0).astype(str).unique())
+            missing = still_missing
+    except Exception as exc:
+        print(f"[data_feed] 本地数据合并失败，降级 yfinance: {exc}", flush=True)
+
+    # 剩余的用 yfinance 兜底（指数、基准等本地没有的）
+    for sym in missing:
+        if sym in seen:
             continue
         frag = fetch_symbol_ohlcv(sym, start, end, cache_dir)
         if frag.empty:

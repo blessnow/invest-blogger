@@ -24,6 +24,7 @@ from invest_system.broker import Broker, create_broker
 from invest_system.cache_janitor import prune_data_cache
 from invest_system.config import Settings, load_settings
 from invest_system.live_phase import run_live_intraday_phase
+from invest_system.live_rotation import run_live_rotation
 
 LIVE_PHASES = (
     ("pre_open", 9, 20),
@@ -31,6 +32,9 @@ LIVE_PHASES = (
     ("midday", 11, 30),
     ("close", 15, 5),
 )
+
+# rotation 策略：每天 14:45（收盘前 15 分钟）调仓
+ROTATION_TIME = (14, 45)
 
 DEFAULT_TZ = "Asia/Shanghai"
 
@@ -44,6 +48,18 @@ def _live_phase_job(settings: Settings, phase_key: str, broker: Broker | None = 
         log.warning("live %s exited: %s", phase_key, exc)
     except Exception:
         log.exception("live %s failed", phase_key)
+
+
+def _rotation_job(settings: Settings, broker: Broker | None = None) -> None:
+    log = logging.getLogger("scheduler.rotation")
+    log.info("running rotation 14:45 调仓")
+    try:
+        summary = run_live_rotation(settings, broker=broker)
+        log.info("rotation done: equity=%s holdings=%s actions=%d",
+                 summary.get("equity"), summary.get("num_holdings"),
+                 len(summary.get("actions") or []))
+    except Exception:
+        log.exception("rotation job failed")
 
 
 def _cache_janitor_job(settings: Settings) -> None:
@@ -85,6 +101,24 @@ def build_scheduler(settings: Settings, *, tz: str = DEFAULT_TZ, broker: Broker 
         coalesce=True,
         misfire_grace_time=3600,
     )
+
+    # rotation 策略：14:45 调仓（仅 STRATEGY_MODE=rotation 或显式开启时）
+    rotation_enabled = (
+        settings.strategy_mode.strip().lower() == "rotation"
+        or str(getattr(settings, "rotation_live_enabled", "")).strip().lower() in ("1","true","yes")
+    )
+    if rotation_enabled:
+        sch.add_job(
+            _rotation_job,
+            CronTrigger(day_of_week="mon-fri",
+                        hour=ROTATION_TIME[0], minute=ROTATION_TIME[1],
+                        timezone=tz),
+            kwargs={"settings": settings, "broker": broker},
+            id="live_rotation",
+            replace_existing=True,
+            coalesce=True,
+            misfire_grace_time=1800,
+        )
 
     # Evolution cycle (disabled by default, enable via EVOLUTION_ENABLED=true)
     if getattr(settings, "evolution_enabled", False):
@@ -141,7 +175,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--tz", default=DEFAULT_TZ, help="时区，默认 Asia/Shanghai")
     parser.add_argument(
         "--run-now",
-        choices=[p[0] for p in LIVE_PHASES] + ["cache"],
+        choices=[p[0] for p in LIVE_PHASES] + ["cache", "rotation"],
         help="立即执行一次指定任务后再常驻（用于排错）",
     )
     args = parser.parse_args(argv)
@@ -215,6 +249,8 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.run_now == "cache":
         _cache_janitor_job(settings)
+    elif args.run_now == "rotation":
+        _rotation_job(settings, broker=None)
     elif args.run_now:
         broker_mode = getattr(settings, "broker_mode", "paper").strip().lower()
         broker = None

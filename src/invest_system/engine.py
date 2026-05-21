@@ -15,10 +15,12 @@ from invest_system.data_feed import ensure_panel_has_symbols, fetch_intraday_las
 from invest_system.assistant.runner import run_intraday_assistant_for_day
 from invest_system.market_scanner import scan_cn_candidates_with_akshare
 from invest_system.market_context import fetch_external_context
+from invest_system.errors import dump_llm_raw, log_error
 from invest_system.llm_strategy import (
     build_user_prompt,
     glm_decision_sync,
     system_prompt_for,
+    validate_decision,
 )
 from invest_system.portfolio import Portfolio
 from invest_system.broker import Broker, OrderResult
@@ -248,9 +250,8 @@ def _apply_actions(
         shares = _lot_floor(raw_sell, lot_size)
         if shares > 0:
             if broker:
-                result = broker.execute("sell", sym, float(shares), price, day=day, ts=ts)
-                if result.success:
-                    portfolio.sell(day, sym, float(shares), price, ts=ts)
+                # broker.execute 内部已调 portfolio.sell，不要重复调用
+                broker.execute("sell", sym, float(shares), price, day=day, ts=ts)
             else:
                 portfolio.sell(day, sym, float(shares), price, ts=ts)
 
@@ -293,9 +294,8 @@ def _apply_actions(
         capped = _cap_buy_shares(portfolio, sym, want, price, max_fraction, prices, lot_size)
         if capped > 0:
             if broker:
-                result = broker.execute("buy", sym, float(capped), price, day=day, ts=ts)
-                if result.success:
-                    portfolio.buy(day, sym, float(capped), price, ts=ts)
+                # broker.execute 内部已调 portfolio.buy，不要重复调用
+                broker.execute("buy", sym, float(capped), price, day=day, ts=ts)
             else:
                 portfolio.buy(day, sym, float(capped), price, ts=ts)
 
@@ -464,7 +464,125 @@ def run_simulation(
             should_rebal = hooks.should_rebalance(rebalance_ctx)
             days_since_last_rebalance += 1
 
-            if should_rebal and settings.strategy_mode.strip().lower() == "llm":
+            strat_mode = settings.strategy_mode.strip().lower()
+
+            if strat_mode == "momentum":
+                # momentum 策略有自己的调仓节奏（MOMENTUM_REBALANCE_EVERY_DAYS）
+                from invest_system.strategies import momentum as _mom
+
+                mp = _mom.params_from_settings(settings)
+                if days_since_last_rebalance >= mp.rebalance_every_days or not portfolio.positions:
+                    days_since_last_rebalance = 0
+                    # 候选池：UNIVERSE + 配置的扫描池；并确保 panel 已加载基准 + 候选数据
+                    cand: list[str] = list(dict.fromkeys([
+                        *fixed_syms,
+                        *settings.market_scan_symbols(),
+                    ]))
+                    bms = settings.reference_benchmark_symbols()
+                    syms_needed = list(dict.fromkeys([*bms, mp.regime_symbol, *cand]))
+                    panel = ensure_panel_has_symbols(panel, syms_needed, start, end, cache_dir)
+                    try:
+                        mom_actions = _mom.decide(
+                            panel=panel, as_of=ts_pd,
+                            candidate_symbols=cand,
+                            positions=dict(portfolio.positions),
+                            avg_cost=dict(portfolio.avg_cost),
+                            cash=portfolio.cash,
+                            equity=portfolio.equity(prices),
+                            lot_size=int(settings.lot_size),
+                            fee_rate=float(settings.commission_rate),
+                            params=mp,
+                        )
+                    except Exception as exc:
+                        log_error(
+                            component="engine", phase="backtest",
+                            error=exc, message="momentum 策略决策失败，本轮跳过",
+                            extra={"day": str(d)},
+                        )
+                        mom_actions = []
+                    if mom_actions:
+                        action_syms = [a["symbol"] for a in mom_actions]
+                        panel = ensure_panel_has_symbols(panel, action_syms, start, end, cache_dir)
+                        prices = latest_row(panel, ts_pd)
+                        _apply_actions(
+                            portfolio, mom_actions, prices, universe, d,
+                            settings.max_position_fraction, int(settings.lot_size),
+                            free_selection=True, broker=broker,
+                        )
+
+            if strat_mode == "rotation":
+                from invest_system.strategies import rotation as _rot
+
+                rp = _rot.params_from_settings(settings)
+                if days_since_last_rebalance >= rp.rebalance_every_days or not portfolio.positions:
+                    days_since_last_rebalance = 0
+                    # 确保 ETF + 基准在 panel 中
+                    needed = list(dict.fromkeys([rp.regime_symbol, *_rot.ETF_UNIVERSE]))
+                    panel = ensure_panel_has_symbols(panel, needed, start, end, cache_dir)
+                    try:
+                        rot_actions, rot_cands = _rot.decide(
+                            panel=panel, as_of=ts_pd,
+                            positions=dict(portfolio.positions),
+                            avg_cost=dict(portfolio.avg_cost),
+                            cash=portfolio.cash,
+                            equity=portfolio.equity(prices),
+                            lot_size=int(settings.lot_size),
+                            fee_rate=float(settings.commission_rate),
+                            params=rp,
+                        )
+                    except Exception as exc:
+                        log_error(component="engine", phase="backtest",
+                                  error=exc, message="rotation 策略决策失败",
+                                  extra={"day": str(d)})
+                        rot_actions = []
+                    if rot_actions:
+                        prices = latest_row(panel, ts_pd)
+                        _apply_actions(
+                            portfolio, rot_actions, prices, universe, d,
+                            settings.max_position_fraction, int(settings.lot_size),
+                            free_selection=True, broker=broker,
+                        )
+
+            if strat_mode == "mainline":
+                from invest_system.strategies import mainline as _ml
+
+                mlp = _ml.params_from_settings(settings)
+                if days_since_last_rebalance >= mlp.rebalance_every_days or not portfolio.positions:
+                    days_since_last_rebalance = 0
+                    try:
+                        ml_actions, ml_cands = _ml.decide(
+                            panel=panel, as_of=ts_pd, decision_day=d,
+                            data_dir=Path(settings.data_dir),
+                            positions=dict(portfolio.positions),
+                            avg_cost=dict(portfolio.avg_cost),
+                            cash=portfolio.cash,
+                            equity=portfolio.equity(prices),
+                            lot_size=int(settings.lot_size),
+                            fee_rate=float(settings.commission_rate),
+                            params=mlp,
+                        )
+                    except Exception as exc:
+                        log_error(
+                            component="engine", phase="backtest",
+                            error=exc, message="mainline 策略决策失败，本轮跳过",
+                            extra={"day": str(d)},
+                        )
+                        ml_actions, ml_cands = [], []
+                    if ml_cands:
+                        # 把候选股票的行情拉进 panel，方便后续撮合
+                        panel = ensure_panel_has_symbols(panel, ml_cands, start, end, cache_dir)
+                        prices = latest_row(panel, ts_pd)
+                    if ml_actions:
+                        action_syms = [a["symbol"] for a in ml_actions]
+                        panel = ensure_panel_has_symbols(panel, action_syms, start, end, cache_dir)
+                        prices = latest_row(panel, ts_pd)
+                        _apply_actions(
+                            portfolio, ml_actions, prices, universe, d,
+                            settings.max_position_fraction, int(settings.lot_size),
+                            free_selection=True, broker=broker,
+                        )
+
+            if should_rebal and strat_mode == "llm":
                 days_since_last_rebalance = 0
                 cal = settings.calendar_symbol.strip().upper()
                 bms = settings.reference_benchmark_symbols()
@@ -612,9 +730,11 @@ def run_simulation(
                         settings,
                         system_prompt=system_prompt_for(settings.selection_mode),
                         user_prompt=user,
+                        phase="backtest",
+                        day=str(d),
                     )
-                    actions = decision.get("actions") if isinstance(decision, dict) else []
-                    if isinstance(actions, list):
+                    actions = validate_decision(decision)
+                    if actions:
                         executable_actions = actions
                         if (
                             free
@@ -673,9 +793,14 @@ def run_simulation(
                             free_selection=free,
                             broker=broker,
                         )
-                except Exception:
-                    # 网络/解析失败则本轮不调仓，避免中断整段回测
-                    pass
+                except Exception as exc:
+                    # 网络/解析失败则本轮不调仓，避免中断整段回测；落盘错误供事后回查
+                    log_error(
+                        component="engine", phase="backtest",
+                        error=exc,
+                        message=f"LLM 决策失败，本轮跳过调仓",
+                        extra={"day": str(d), "num_holdings": len(portfolio.positions)},
+                    )
 
         eq = portfolio.equity(prices)
         if eq > peak_equity:

@@ -197,6 +197,63 @@ class Settings(BaseSettings):
     )
     seed_data_enabled: bool = Field(default=True, validation_alias="SEED_DATA_ENABLED")
 
+    # ---- Momentum strategy params (STRATEGY_MODE=momentum) ----
+    momentum_top_k: int = Field(default=5, validation_alias="MOMENTUM_TOP_K")
+    momentum_ret20_min: float = Field(default=5.0, validation_alias="MOMENTUM_RET20_MIN")
+    momentum_stop_loss_pct: float = Field(default=8.0, validation_alias="MOMENTUM_STOP_LOSS_PCT")
+    momentum_rebalance_every_days: int = Field(
+        default=5, validation_alias="MOMENTUM_REBALANCE_EVERY_DAYS"
+    )
+    momentum_regime_symbol: str = Field(
+        default="000300.SS", validation_alias="MOMENTUM_REGIME_SYMBOL"
+    )
+    momentum_regime_ma_window: int = Field(
+        default=200, validation_alias="MOMENTUM_REGIME_MA_WINDOW"
+    )
+    momentum_ma_short: int = Field(default=20, validation_alias="MOMENTUM_MA_SHORT")
+    momentum_ma_long: int = Field(default=60, validation_alias="MOMENTUM_MA_LONG")
+    momentum_window: int = Field(default=60, validation_alias="MOMENTUM_WINDOW")
+    momentum_deploy_fraction: float = Field(
+        default=0.95, validation_alias="MOMENTUM_DEPLOY_FRACTION"
+    )
+
+    # ---- Mainline strategy params (STRATEGY_MODE=mainline) ----
+    mainline_top_k: int = Field(default=3, validation_alias="MAINLINE_TOP_K")
+    mainline_min_conseq_limits: int = Field(default=2, validation_alias="MAINLINE_MIN_CONSEQ_LIMITS")
+    mainline_max_prior5d_ret_pct: float = Field(default=60.0, validation_alias="MAINLINE_MAX_PRIOR5D_RET_PCT")
+    mainline_min_market_cap_yi: float = Field(default=20.0, validation_alias="MAINLINE_MIN_MARKET_CAP_YI")
+    mainline_max_market_cap_yi: float = Field(default=500.0, validation_alias="MAINLINE_MAX_MARKET_CAP_YI")
+    mainline_stop_loss_pct: float = Field(default=7.0, validation_alias="MAINLINE_STOP_LOSS_PCT")
+    mainline_trail_ma_days: int = Field(default=5, validation_alias="MAINLINE_TRAIL_MA_DAYS")
+    mainline_take_profit_pct: float = Field(default=30.0, validation_alias="MAINLINE_TAKE_PROFIT_PCT")
+    mainline_rebalance_every_days: int = Field(default=2, validation_alias="MAINLINE_REBALANCE_EVERY_DAYS")
+    mainline_deploy_fraction: float = Field(default=0.95, validation_alias="MAINLINE_DEPLOY_FRACTION")
+    mainline_max_open_gap_pct: float = Field(default=7.0, validation_alias="MAINLINE_MAX_OPEN_GAP_PCT")
+    mainline_candidate_pool_size: int = Field(default=10, validation_alias="MAINLINE_CANDIDATE_POOL_SIZE")
+    mainline_regime_symbol: str = Field(default="000300.SS", validation_alias="MAINLINE_REGIME_SYMBOL")
+    mainline_regime_ma_window: int = Field(default=20, validation_alias="MAINLINE_REGIME_MA_WINDOW")
+    mainline_regime_enabled: bool = Field(default=True, validation_alias="MAINLINE_REGIME_ENABLED")
+    mainline_pullback_lookback_days: int = Field(default=10, validation_alias="MAINLINE_PULLBACK_LOOKBACK_DAYS")
+    mainline_pullback_from_high_min: float = Field(default=5.0, validation_alias="MAINLINE_PULLBACK_FROM_HIGH_MIN")
+    mainline_pullback_from_high_max: float = Field(default=20.0, validation_alias="MAINLINE_PULLBACK_FROM_HIGH_MAX")
+    mainline_pullback_recent_chg_min: float = Field(default=-3.0, validation_alias="MAINLINE_PULLBACK_RECENT_CHG_MIN")
+    mainline_pullback_recent_chg_max: float = Field(default=5.0, validation_alias="MAINLINE_PULLBACK_RECENT_CHG_MAX")
+    mainline_pullback_above_ma: int = Field(default=10, validation_alias="MAINLINE_PULLBACK_ABOVE_MA")
+    mainline_pullback_min_days_since_limit: int = Field(default=1, validation_alias="MAINLINE_PULLBACK_MIN_DAYS_SINCE_LIMIT")
+
+    # ---- Rotation 策略参数 (STRATEGY_MODE=rotation) ----
+    rotation_top_k: int = Field(default=3, validation_alias="ROTATION_TOP_K")
+    rotation_momentum_window: int = Field(default=20, validation_alias="ROTATION_MOMENTUM_WINDOW")
+    rotation_rebalance_every_days: int = Field(default=5, validation_alias="ROTATION_REBALANCE_EVERY_DAYS")
+    rotation_stop_loss_pct: float = Field(default=8.0, validation_alias="ROTATION_STOP_LOSS_PCT")
+    rotation_deploy_fraction: float = Field(default=0.95, validation_alias="ROTATION_DEPLOY_FRACTION")
+    rotation_regime_symbol: str = Field(default="000300.SS", validation_alias="ROTATION_REGIME_SYMBOL")
+    rotation_regime_ma_window: int = Field(default=60, validation_alias="ROTATION_REGIME_MA_WINDOW")
+    rotation_regime_enabled: bool = Field(default=True, validation_alias="ROTATION_REGIME_ENABLED")
+    rotation_require_uptrend: bool = Field(default=True, validation_alias="ROTATION_REQUIRE_UPTREND")
+    rotation_uptrend_ma_window: int = Field(default=20, validation_alias="ROTATION_UPTREND_MA_WINDOW")
+    rotation_live_enabled: bool = Field(default=False, validation_alias="ROTATION_LIVE_ENABLED")
+
     broker_mode: str = Field(default="paper", validation_alias="BROKER_MODE")
     jvquant_token: str = Field(default="", validation_alias="JVQUANT_TOKEN")
     jvquant_account: str = Field(default="", validation_alias="JVQUANT_ACCOUNT")
